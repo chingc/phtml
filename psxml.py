@@ -23,13 +23,13 @@ class PrettySimpleXML():
 
     def _empty(self, tag, attr, newline):
         """Add an empty element."""
-        self._output.append(self._untrim("<{} {} />".format(tag, " ".join(attr)), newline))
+        self._output.append(self._untrim("<{} />".format(" ".join([tag] + attr)), newline))
         return self
 
     def _begin(self, tag, attr, value, newline):
         """Begin and add a new element."""
         self._open_tags.append(tag)
-        self._output.append(self._untrim("<{} {}>{}".format(tag, " ".join(attr), value), newline))
+        self._output.append(self._untrim("<{}>{}".format(" ".join([tag] + attr), value), newline))
         self._depth += 1
         return self
 
