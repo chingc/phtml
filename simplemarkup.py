@@ -1,4 +1,4 @@
-"""simplemarkup, version 2.0, https://github.com/smwst/simplemarkup
+"""simplemarkup, version 2.1, https://github.com/smwst/simplemarkup
 
 Copyright (c) 2012, Ching Chow
 All rights reserved.
@@ -78,8 +78,10 @@ class SimpleMarkup():
     def _begin(self, tag, attr, value, newline):
         """Begin and add a new element."""
         self._open_tags.append(tag)
-        self._output.append(self._untrim("<{}{}>{}".format(tag, self._attr_str(attr), value), newline))
+        self._output.append(self._untrim("<{}{}>".format(tag, self._attr_str(attr)), newline))
         self._depth += 1
+        if len(value) > 0:
+            self._output.append(self._untrim(value, newline))
         return self
 
     def _end(self, newline):
