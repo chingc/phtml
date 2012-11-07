@@ -93,7 +93,7 @@ class SimpleMarkup():
     # # # # #
 
     def output(self):
-        """Returns the output in pretty print."""
+        """Returns the raw output."""
         return "".join(self._output)
 
     def raw(self, string):

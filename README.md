@@ -29,7 +29,7 @@ Note: simplemarkup was written and tested under Python 3.3.0.  It should be able
 
 #### Methods
 
-`output()` Returns the output in pretty print.
+`output()` Returns the raw output.
 
 `raw(string)` Add a string exactly as given.
 
