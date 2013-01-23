@@ -92,7 +92,7 @@ This example gives a taste of what makes simplemarkup really powerful.
     </ul>
     >>>
 
-Note: simplemarkup allows function chaining.  The contents of the loop can be reduced to `sm.begin("li", value=fruit).endln()`.
+Note: simplemarkup allows method chaining.  The contents of the loop can be reduced to `sm.begin("li", value=fruit).endln()`.
 
 
 ## License
