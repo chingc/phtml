@@ -102,5 +102,5 @@ simplemarkup is distributed under the Simplified BSD license.  See [LICENSE][2] 
 
 
 
-[1]: https://raw.github.com/smwst/smwst.github.com/master/DJRivals/index.html
-[2]: https://github.com/smwst/simplemarkup/blob/master/LICENSE "License"
+[1]: https://raw.github.com/chingc/chingc.github.com/master/DJRivals/index.html
+[2]: https://github.com/chingc/simplemarkup/blob/master/LICENSE "License"
