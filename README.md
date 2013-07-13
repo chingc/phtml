@@ -1,6 +1,6 @@
 # simplemarkup
 
-A simple little pretty print markup generator.
+A simple pretty print markup generator.
 
 This is something I created to help generate HTML for one of my other projects.  I wrote this because many of the tools already available were too complex or too big for my needs.  This will not check markup for validity, it simply creates pretty output for the input its given.
 
