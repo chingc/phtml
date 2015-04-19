@@ -1,3 +1,9 @@
+## 0.1.0
+2015-04-19
+
+- Re-released 2.1 using semantic versioning as 0.1.0.
+
+
 ## 2.1
 2012-11-07
 
