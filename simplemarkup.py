@@ -1,11 +1,17 @@
 """A simple pretty print markup generator."""
 
+from contextlib import contextmanager
+
+
 class SimpleMarkup():
-    def __init__(self, width=4):
+    def __init__(self, spaces=4):
         self._output = []
         self._open_tags = []
-        self._width = " " * width
+        self._width = " " * spaces
         self._depth = 0
+        self.indent = " " * spaces
+        self.depth = 0
+        self.output = []
 
     def _check(self, value):
         """Raises ValueError if given is not a string."""
@@ -104,3 +110,53 @@ class SimpleMarkup():
         if self._depth == 0:
             raise IndexError("already ended")
         return self._end(True)
+
+    # # # # #
+
+    def _verify_str_(self, obj):
+        """Raises TypeError if the given object is not a string."""
+        if not isinstance(obj, str):
+            raise TypeError("Type must be a string, but got {}".format(obj))
+
+    def _verify_list_(self, obj):
+        """Raises TypeError if the given object is not a list of 2-tuple strings."""
+        if not isinstance(obj, list):
+            raise TypeError("Type must be a list of 2-tuple strings, but got {}".format(obj))
+        for element in obj:
+            if not isinstance(element, tuple) or len(element) != 2:
+                raise TypeError("Type must be a list of 2-tuple strings, but got {}".format(obj))
+        for first, second in obj:
+            if not isinstance(first, str) or not isinstance(second, str):
+                raise TypeError("Type must be a list of 2-tuple strings, but got {}".format(obj))
+
+    @contextmanager
+    def tag(self, name, attr=None):
+        if attr is None:
+            attr = []
+        self.output.append("{}<{}>\n".format(self.indent * self.depth, name))
+        self.depth += 1
+        yield
+        self.depth -= 1
+        self.output.append("{}</{}>\n".format(self.indent * self.depth, name))
+
+    @contextmanager
+    def itag(self, name, attr=None):
+        if attr is None:
+            attr = []
+        self.output.append("{}<{}>".format(self.indent * self.depth, name))
+        saved, self.depth = self.depth, 0
+        yield
+        self.depth = saved
+        self.output.append("</{}>".format(name))
+        return self
+
+    def insert(self, string):
+        self.output.append("{}{}".format(self.indent * self.depth, string))
+        return self
+
+    def newline(self):
+        self.output.append("\n")
+        return self
+
+    def print(self):
+        print("".join(self.output))
