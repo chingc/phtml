@@ -68,54 +68,66 @@ class TestSimpleMarkup(unittest.TestCase):
         sm = simplemarkup.SimpleMarkup()
 
         sm.insert("Hello")
-        self.assertEqual(sm.output, ["Hello"])
+        self.assertEqual(sm.raw, ["Hello"])
+        self.assertEqual(sm.out(), "Hello")
 
         sm.insert("World")
-        self.assertEqual(sm.output, ["Hello", "World"])
+        self.assertEqual(sm.raw, ["Hello", "World"])
+        self.assertEqual(sm.out(), "HelloWorld")
 
         sm.depth = 1
         sm.insert("One")
         one = sm.indent * sm.depth
-        self.assertEqual(sm.output, ["Hello", "World", one + "One"])
+        self.assertEqual(sm.raw, ["Hello", "World", one + "One"])
+        self.assertEqual(sm.out(), "HelloWorld{}One".format(one))
 
         sm.depth = 2
         sm.insert("Two")
         two = sm.indent * sm.depth
-        self.assertEqual(sm.output, ["Hello", "World", one + "One", two + "Two"])
+        self.assertEqual(sm.raw, ["Hello", "World", one + "One", two + "Two"])
+        self.assertEqual(sm.out(), "HelloWorld{}One{}Two".format(one, two))
 
         sm.depth = 3
         sm.insert("Three")
         three = sm.indent * sm.depth
-        self.assertEqual(sm.output, ["Hello", "World", one + "One", two + "Two", three + "Three"])
+        self.assertEqual(sm.raw, ["Hello", "World", one + "One", two + "Two", three + "Three"])
+        self.assertEqual(sm.out(), "HelloWorld{}One{}Two{}Three".format(one, two, three))
 
         sm.depth = 0
         sm.insert("Bye").insert("Bye")
-        self.assertEqual(sm.output, ["Hello", "World", one + "One", two + "Two", three + "Three", "Bye", "Bye"])
+        self.assertEqual(sm.raw, ["Hello", "World", one + "One", two + "Two", three + "Three", "Bye", "Bye"])
+        self.assertEqual(sm.out(), "HelloWorld{}One{}Two{}ThreeByeBye".format(one, two, three))
 
     def test_newline(self):
         sm = simplemarkup.SimpleMarkup()
 
         sm.newline()
-        self.assertEqual(sm.output, ["\n"])
+        self.assertEqual(sm.raw, ["\n"])
+        self.assertEqual(sm.out(), "\n")
 
         sm.newline()
-        self.assertEqual(sm.output, ["\n", "\n"])
+        self.assertEqual(sm.raw, ["\n", "\n"])
+        self.assertEqual(sm.out(), "\n\n")
 
         sm.depth = 1
         sm.newline()
-        self.assertEqual(sm.output, ["\n", "\n", "\n"])
+        self.assertEqual(sm.raw, ["\n", "\n", "\n"])
+        self.assertEqual(sm.out(), "\n\n\n")
 
         sm.depth = 2
         sm.newline()
-        self.assertEqual(sm.output, ["\n", "\n", "\n", "\n"])
+        self.assertEqual(sm.raw, ["\n", "\n", "\n", "\n"])
+        self.assertEqual(sm.out(), "\n\n\n\n")
 
         sm.depth = 3
         sm.newline()
-        self.assertEqual(sm.output, ["\n", "\n", "\n", "\n", "\n"])
+        self.assertEqual(sm.raw, ["\n", "\n", "\n", "\n", "\n"])
+        self.assertEqual(sm.out(), "\n\n\n\n\n")
 
         sm.depth = 0
         sm.newline().newline()
-        self.assertEqual(sm.output, ["\n", "\n", "\n", "\n", "\n", "\n", "\n"])
+        self.assertEqual(sm.raw, ["\n", "\n", "\n", "\n", "\n", "\n", "\n"])
+        self.assertEqual(sm.out(), "\n\n\n\n\n\n\n")
 
 
 if __name__ == "__main__":
