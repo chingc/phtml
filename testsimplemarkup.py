@@ -20,49 +20,49 @@ class TestSimpleMarkup(unittest.TestCase):
         for element in [x for x in types if isinstance(x, str)]:
             self.assertIsNone(sm._verify_str_(element))
 
-        ### test _verify_list_ ###
+        ### test _verify_attr_ ###
 
         # no lists
         with self.assertRaises(TypeError):
             for element in [x for x in types if not isinstance(x, list)]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # empty list
-        self.assertIsNone(sm._verify_list_([]))
+        self.assertIsNone(sm._verify_attr_([]))
 
         # 1 element lists
         with self.assertRaises(TypeError):
             for element in [[x] for x in types]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # 2 element lists
         with self.assertRaises(TypeError):
             for element in [[x, y] for x in types for y in types]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # 3 element lists
         with self.assertRaises(TypeError):
             for element in [[x, y, z] for x in types for y in types for z in types]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # 1-tuple lists
         with self.assertRaises(TypeError):
             for element in [[(x,)] for x in types]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # 2-tuple lists, no strings
         with self.assertRaises(TypeError):
             for element in [[(x, y)] for x in types if not isinstance(x, str) for y in types if not isinstance(y, str)]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # 3-tuple lists
         with self.assertRaises(TypeError):
             for element in [[(x, y, z)] for x in types for y in types for z in types]:
-                sm._verify_list_(element)
+                sm._verify_attr_(element)
 
         # 2-tuple lists, only strings
         for element in [[(x, y)] for x in types if isinstance(x, str) for y in types if isinstance(y, str)]:
-            self.assertIsNone(sm._verify_list_(element))
+            self.assertIsNone(sm._verify_attr_(element))
 
     def test_insert(self):
         sm = simplemarkup.SimpleMarkup()

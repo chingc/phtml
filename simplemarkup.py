@@ -118,7 +118,7 @@ class SimpleMarkup():
         if not isinstance(obj, str):
             raise TypeError("Type must be a string, but got {}".format(obj))
 
-    def _verify_list_(self, obj):
+    def _verify_attr_(self, obj):
         """Raises TypeError if the given object is not a list of 2-tuple strings."""
         if not isinstance(obj, list):
             raise TypeError("Type must be a list of 2-tuple strings, but got {}".format(obj))
@@ -129,29 +129,38 @@ class SimpleMarkup():
             if not isinstance(first, str) or not isinstance(second, str):
                 raise TypeError("Type must be a list of 2-tuple strings, but got {}".format(obj))
 
+    def _expand_attr_(self, attr):
+        attribute = []
+        for name, value in attr:
+            attribute.append('{}="{}"'.format(name, value))
+        return " " + " ".join(attribute) if len(attribute) > 0 else ""
+
     @contextmanager
     def tag(self, name, attr=None):
         if attr is None:
             attr = []
-        self.raw.append("{}<{}>\n".format(self.indent * self.depth, name))
+        self._verify_str_(name)
+        self._verify_attr_(attr)
+        self.raw.append("{}<{}{}>\n".format(self.indent * self.depth, name, self._expand_attr_(attr)))
         self.depth += 1
         yield
         self.depth -= 1
         self.raw.append("{}</{}>\n".format(self.indent * self.depth, name))
 
     @contextmanager
-    def itag(self, name, attr=None):
+    def itag(self, name, attr=None, indent=True):
         if attr is None:
             attr = []
-        self.raw.append("{}<{}>".format(self.indent * self.depth, name))
-        saved, self.depth = self.depth, 0
+        self._verify_str_(name)
+        self._verify_attr_(attr)
+        self.raw.append("{}<{}{}>".format(self.indent * self.depth if indent else "", name, self._expand_attr_(attr)))
         yield
-        self.depth = saved
         self.raw.append("</{}>".format(name))
         return self
 
-    def insert(self, string):
-        self.raw.append("{}{}".format(self.indent * self.depth, string))
+    def insert(self, string, indent=True):
+        self._verify_str_(string)
+        self.raw.append("{}{}".format(self.indent * self.depth if indent else "", string))
         return self
 
     def newline(self):
