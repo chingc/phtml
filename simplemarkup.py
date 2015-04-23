@@ -11,7 +11,7 @@ class SimpleMarkup():
         self._depth = 0
         self.indent = " " * spaces
         self.depth = 0
-        self.output = []
+        self.raw = []
 
     def _check(self, value):
         """Raises ValueError if given is not a string."""
@@ -133,30 +133,30 @@ class SimpleMarkup():
     def tag(self, name, attr=None):
         if attr is None:
             attr = []
-        self.output.append("{}<{}>\n".format(self.indent * self.depth, name))
+        self.raw.append("{}<{}>\n".format(self.indent * self.depth, name))
         self.depth += 1
         yield
         self.depth -= 1
-        self.output.append("{}</{}>\n".format(self.indent * self.depth, name))
+        self.raw.append("{}</{}>\n".format(self.indent * self.depth, name))
 
     @contextmanager
     def itag(self, name, attr=None):
         if attr is None:
             attr = []
-        self.output.append("{}<{}>".format(self.indent * self.depth, name))
+        self.raw.append("{}<{}>".format(self.indent * self.depth, name))
         saved, self.depth = self.depth, 0
         yield
         self.depth = saved
-        self.output.append("</{}>".format(name))
+        self.raw.append("</{}>".format(name))
         return self
 
     def insert(self, string):
-        self.output.append("{}{}".format(self.indent * self.depth, string))
+        self.raw.append("{}{}".format(self.indent * self.depth, string))
         return self
 
     def newline(self):
-        self.output.append("\n")
+        self.raw.append("\n")
         return self
 
-    def print(self):
-        print("".join(self.output))
+    def out(self):
+        return "".join(self.raw)
