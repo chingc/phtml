@@ -64,6 +64,14 @@ class TestSimpleMarkup(unittest.TestCase):
         for element in [[(x, y)] for x in types if isinstance(x, str) for y in types if isinstance(y, str)]:
             self.assertIsNone(sm._verify_attr_(element))
 
+    def test_expand_attr(self):
+        sm = simplemarkup.SimpleMarkup()
+
+        self.assertEqual('', sm._expand_attr_([]))
+        self.assertEqual(' hello="world"', sm._expand_attr_([("hello", "world")]))
+        self.assertEqual(' a="1" b="2"', sm._expand_attr_([("a", "1"), ("b", "2")]))
+        self.assertEqual(' a="1" b="2" c="3"', sm._expand_attr_([("a", "1"), ("b", "2"), ("c", "3")]))
+
     def test_insert(self):
         sm = simplemarkup.SimpleMarkup()
 
