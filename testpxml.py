@@ -75,13 +75,16 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(' a="1" b="2" c="3"', PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]))
 
     def test_indent(self):
-        pxml = PXML()
-
         for spaces in range(5):
+            pxml = PXML()
             pxml.spaces = spaces
             for depth in range(5):
                 pxml.depth = depth
-                self.assertEqual(" " * spaces * depth, pxml.indent())
+                pxml.indent()
+                self.assertEqual([" " * spaces * depth], pxml.raw)
+                self.assertEqual(" " * spaces * depth, str(pxml))
+                pxml.raw.clear()
+            del pxml
 
     def test_insert(self):
         pxml = PXML()
@@ -95,26 +98,25 @@ class TestPXML(unittest.TestCase):
         self.assertEqual("HelloWorld", str(pxml))
 
         pxml.depth = 1
-        pxml.insert("One")
-        one = pxml.indent()
-        self.assertEqual(["Hello", "World", one + "One"], pxml.raw)
+        pxml.indent().insert("One")
+        one = " " * pxml.spaces * pxml.depth
+        self.assertEqual(["Hello", "World", one, "One"], pxml.raw)
         self.assertEqual("HelloWorld{}One".format(one), str(pxml))
 
         pxml.depth = 2
-        pxml.insert("Two")
-        two = pxml.indent()
-        self.assertEqual(["Hello", "World", one + "One", two + "Two"], pxml.raw)
+        pxml.indent().insert("Two")
+        two = " " * pxml.spaces * pxml.depth
+        self.assertEqual(["Hello", "World", one, "One", two, "Two"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two".format(one, two), str(pxml))
 
         pxml.depth = 3
-        pxml.insert("Three")
-        three = pxml.indent()
-        self.assertEqual(["Hello", "World", one + "One", two + "Two", three + "Three"], pxml.raw)
+        pxml.indent().insert("Three")
+        three = " " * pxml.spaces * pxml.depth
+        self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two{}Three".format(one, two, three), str(pxml))
 
-        pxml.depth = 0
         pxml.insert("Bye").insert("Bye")
-        self.assertEqual(["Hello", "World", one + "One", two + "Two", three + "Three", "Bye", "Bye"], pxml.raw)
+        self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three", "Bye", "Bye"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two{}ThreeByeBye".format(one, two, three), str(pxml))
 
     def test_newline(self):
