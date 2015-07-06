@@ -51,33 +51,36 @@ class PXML():
         self.insert(" " * self.spaces * self.depth)
         return self
 
-    @contextmanager
-    def tag(self, name, attr=None):
-        if attr is None:
-            attr = []
-        self.indent().insert("<{}{}>\n".format(name, PXML.attributes(attr)))
-        self.depth += 1
-        yield
-        self.depth -= 1
-        self.indent().insert("</{}>\n".format(name))
-        return self
-
-    @contextmanager
-    def itag(self, name, attr=None):
-        if attr is None:
-            attr = []
-        self.insert("<{}{}>".format(name, PXML.attributes(attr)))
-        yield
-        self.insert("</{}>".format(name))
-        return self
-
     def insert(self, string):
         """Add a string."""
         self.check_str(string)
-        self.raw.append(string)
+        if len(string) > 0:
+            self.raw.append(string)
         return self
 
     def newline(self):
         """Add a newline."""
         self.insert("\n")
+        return self
+
+    @contextmanager
+    def tag(self, name, attr=None):
+        """Add tagged content."""
+        if attr is None:
+            attr = []
+        self.indent().insert("<{}{}>".format(name, PXML.attributes(attr))).newline()
+        self.depth += 1
+        yield
+        self.depth -= 1
+        self.indent().insert("</{}>".format(name)).newline()
+        return self
+
+    @contextmanager
+    def itag(self, name, attr=None):
+        """Add inline tagged content."""
+        if attr is None:
+            attr = []
+        self.insert("<{}{}>".format(name, PXML.attributes(attr)))
+        yield
+        self.insert("</{}>".format(name))
         return self

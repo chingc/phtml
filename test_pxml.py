@@ -89,18 +89,23 @@ class TestPXML(unittest.TestCase):
         self.assertEqual("", str(pxml))
 
     def test_indent(self):
-        for spaces in range(5):
+        pxml = PXML()
+
+        pxml.indent()
+        self.assertEqual([], pxml.raw)
+        self.assertEqual("", str(pxml))
+
+        for spaces in range(1, 5):
             pxml = PXML(spaces)
-            for depth in range(5):
+            for depth in range(1, 5):
                 pxml.depth = depth
                 pxml.indent()
                 self.assertEqual([" " * spaces * depth], pxml.raw)
                 self.assertEqual(" " * spaces * depth, str(pxml))
                 pxml.clear()
-            del pxml
 
     def test_insert(self):
-        pxml = PXML()
+        pxml = PXML(4)
 
         pxml.insert("Hello")
         self.assertEqual(["Hello"], pxml.raw)
@@ -112,19 +117,19 @@ class TestPXML(unittest.TestCase):
 
         pxml.depth = 1
         pxml.indent().insert("One")
-        one = " " * pxml.spaces * pxml.depth
+        one = "    "
         self.assertEqual(["Hello", "World", one, "One"], pxml.raw)
         self.assertEqual("HelloWorld{}One".format(one), str(pxml))
 
         pxml.depth = 2
         pxml.indent().insert("Two")
-        two = " " * pxml.spaces * pxml.depth
+        two = "        "
         self.assertEqual(["Hello", "World", one, "One", two, "Two"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two".format(one, two), str(pxml))
 
         pxml.depth = 3
         pxml.indent().insert("Three")
-        three = " " * pxml.spaces * pxml.depth
+        three = "            "
         self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two{}Three".format(one, two, three), str(pxml))
 
@@ -191,13 +196,90 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(['<span id="Hello">', '<span id="World">', "HelloWorld", "</span>", "</span>"], pxml.raw)
         self.assertEqual('<span id="Hello"><span id="World">HelloWorld</span></span>', str(pxml))
 
+    def test_tag(self):
+        pxml = PXML(4)
+
+        """
+        <b>
+            HelloWorld
+        </b>
+        """
+        with pxml.tag("b"):
+            pxml.indent().insert("HelloWorld").newline()
+        self.assertEqual(["<b>", "\n", "    ", "HelloWorld", "\n", "</b>", "\n"], pxml.raw)
+        self.assertEqual("<b>\n    HelloWorld\n</b>\n", str(pxml))
+
+        """
+        <b>
+            <i>
+                HelloWorld
+            </i>
+        </b>
+        """
         pxml.clear()
-        with pxml.itag("span"):
-            pxml.insert("Hello")
-        with pxml.itag("span"):
-            pxml.insert("World")
-        self.assertEqual(["<span>", "Hello", "</span>", "<span>", "World", "</span>"], pxml.raw)
-        self.assertEqual("<span>Hello</span><span>World</span>", str(pxml))
+        with pxml.tag("b"):
+            with pxml.tag("i"):
+                pxml.indent().insert("HelloWorld").newline()
+        self.assertEqual(["<b>", "\n", "    ", "<i>", "\n", "        ", "HelloWorld", "\n", "    ", "</i>", "\n", "</b>", "\n"], pxml.raw)
+        self.assertEqual("<b>\n    <i>\n        HelloWorld\n    </i>\n</b>\n", str(pxml))
+
+        """
+        <b>
+            <i>
+                <u>
+                    HelloWorld
+                </u>
+            </i>
+        </b>
+        """
+        pxml.clear()
+        with pxml.tag("b"):
+            with pxml.tag("i"):
+                with pxml.tag("u"):
+                    pxml.indent().insert("HelloWorld").newline()
+        self.assertEqual(["<b>", "\n", "    ", "<i>", "\n", "        ", "<u>", "\n", "            ", "HelloWorld", "\n", "        ", "</u>", "\n", "    ", "</i>", "\n", "</b>", "\n"], pxml.raw)
+        self.assertEqual("<b>\n    <i>\n        <u>\n            HelloWorld\n        </u>\n    </i>\n</b>\n", str(pxml))
+
+        """
+        <b>
+            Hello
+        </b>
+        <b>
+            World
+        </b>
+        """
+        pxml.clear()
+        with pxml.tag("b"):
+            pxml.indent().insert("Hello").newline()
+        with pxml.tag("b"):
+            pxml.indent().insert("World").newline()
+        self.assertEqual(["<b>", "\n", "    ", "Hello", "\n", "</b>", "\n", "<b>", "\n", "    ", "World", "\n", "</b>", "\n"], pxml.raw)
+        self.assertEqual("<b>\n    Hello\n</b>\n<b>\n    World\n</b>\n", str(pxml))
+
+        """
+        <span id="Hello">
+            Hello
+        </span>
+        """
+        pxml.clear()
+        with pxml.tag("span", [("id", "Hello")]):
+            pxml.indent().insert("Hello").newline()
+        self.assertEqual(['<span id="Hello">', "\n", "    ", "Hello", "\n", "</span>", "\n"], pxml.raw)
+        self.assertEqual('<span id="Hello">\n    Hello\n</span>\n', str(pxml))
+
+        """
+        <span id="Hello">
+            <span id="World">
+                HelloWorld
+            </span>
+        </span>
+        """
+        pxml.clear()
+        with pxml.tag("span", [("id", "Hello")]):
+            with pxml.tag("span", [("id", "World")]):
+                pxml.indent().insert("HelloWorld").newline()
+        self.assertEqual(['<span id="Hello">', "\n", "    ", '<span id="World">', "\n", "        ", "HelloWorld", "\n", "    ", "</span>", "\n", "</span>", "\n"], pxml.raw)
+        self.assertEqual('<span id="Hello">\n    <span id="World">\n        HelloWorld\n    </span>\n</span>\n', str(pxml))
 
 
 if __name__ == "__main__":
