@@ -48,31 +48,27 @@ class PXML():
 
     def indent(self):
         """Add indentation."""
-        self.raw.append(" " * self.spaces * self.depth)
+        self.insert(" " * self.spaces * self.depth)
         return self
 
     @contextmanager
     def tag(self, name, attr=None):
-        PXML.check_str(name)
         if attr is None:
             attr = []
-        self.indent()
-        self.raw.append("<{}{}>\n".format(name, PXML.attributes(attr)))
+        self.indent().insert("<{}{}>\n".format(name, PXML.attributes(attr)))
         self.depth += 1
         yield
         self.depth -= 1
-        self.indent()
-        self.raw.append("</{}>\n".format(name))
+        self.indent().insert("</{}>\n".format(name))
         return self
 
     @contextmanager
     def itag(self, name, attr=None):
-        PXML.check_str(name)
         if attr is None:
             attr = []
-        self.raw.append("<{}{}>".format(name, PXML.attributes(attr)))
+        self.insert("<{}{}>".format(name, PXML.attributes(attr)))
         yield
-        self.raw.append("</{}>".format(name))
+        self.insert("</{}>".format(name))
         return self
 
     def insert(self, string):
@@ -83,5 +79,5 @@ class PXML():
 
     def newline(self):
         """Add a newline."""
-        self.raw.append("\n")
+        self.insert("\n")
         return self
