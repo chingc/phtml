@@ -40,6 +40,12 @@ class PXML():
             to_string += ' {}="{}"'.format(name, value)
         return to_string
 
+    def clear(self):
+        """Clear everything."""
+        self.raw.clear()
+        self.depth = 0
+        return self
+
     def indent(self):
         """Add indentation."""
         self.raw.append(" " * self.spaces * self.depth)
@@ -70,10 +76,12 @@ class PXML():
         return self
 
     def insert(self, string):
+        """Add a string."""
         self.check_str(string)
         self.raw.append(string)
         return self
 
     def newline(self):
+        """Add a newline."""
         self.raw.append("\n")
         return self

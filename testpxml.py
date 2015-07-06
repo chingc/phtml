@@ -74,6 +74,20 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(' a="1" b="2"', PXML.attributes([("a", "1"), ("b", "2")]))
         self.assertEqual(' a="1" b="2" c="3"', PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]))
 
+    def test_clear(self):
+        pxml = PXML()
+
+        pxml.depth = 1
+        pxml.insert("Hello").insert("World")
+        self.assertEqual(1, pxml.depth)
+        self.assertEqual(["Hello", "World"], pxml.raw)
+        self.assertEqual("HelloWorld", str(pxml))
+
+        pxml.clear()
+        self.assertEqual(0, pxml.depth)
+        self.assertEqual([], pxml.raw)
+        self.assertEqual("", str(pxml))
+
     def test_indent(self):
         for spaces in range(5):
             pxml = PXML()
