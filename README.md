@@ -32,6 +32,16 @@ pxml = PXML()          # create the object
 ' id="skinner" class="principal"'
 ```
 
+`etag(name, attr)` Add empty tag content.
+- name: Name of the tag.
+- attr: (Optional) A list of 2-tuple strings.
+
+``` python
+>>> pxml.etag("img", [("src", "/channel_6/homer_file_photo.png"), ("width", "640"), ("height", "480")])
+>>> print(pxml)
+<img src="/channel_6/homer_file_photo.png" width="640" height="480" />
+```
+
 `indent(repeat)` Add indentation.
 - repeat: (Optional) The number of times to indent.  Default: 1
 
@@ -59,7 +69,7 @@ Lisa
 
 #### Context Managers
 
-`tag(name, attr)` Add tagged content.
+`tag(name, attr)` Add tag content.
 - name: Name of the tag.
 - attr: (Optional) A list of 2-tuple strings.
 
@@ -73,7 +83,7 @@ Lisa
 </div>
 ```
 
-`itag(name, attr)` Add inline tagged content.
+`itag(name, attr)` Add inline tag content.
 - name: Name of the tag.
 - attr: (Optional) A list of 2-tuple strings.
 

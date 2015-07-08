@@ -43,6 +43,17 @@ class PXML():
             to_string += ' {}="{}"'.format(name, value)
         return to_string
 
+    def etag(self, name, attr=None):
+        """Add empty tag content.
+
+        name: Name of the tag.
+        attr: (Optional) A list of 2-tuple strings.
+        """
+        if attr is None:
+            attr = []
+        self.insert("<{}{} />".format(name, PXML.attributes(attr)))
+        return self
+
     def indent(self, repeat=1):
         """Add indentation.
 
@@ -70,7 +81,7 @@ class PXML():
 
     @contextmanager
     def tag(self, name, attr=None):
-        """Add tagged content.
+        """Add tag content.
 
         name: Name of the tag.
         attr: (Optional) A list of 2-tuple strings.
@@ -86,7 +97,7 @@ class PXML():
 
     @contextmanager
     def itag(self, name, attr=None):
-        """Add inline tagged content.
+        """Add inline tag content.
 
         name: Name of the tag.
         attr: (Optional) A list of 2-tuple strings.

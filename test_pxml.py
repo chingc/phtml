@@ -74,6 +74,17 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(' a="1" b="2"', PXML.attributes([("a", "1"), ("b", "2")]))
         self.assertEqual(' a="1" b="2" c="3"', PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]))
 
+    def test_etag(self):
+        pxml = PXML()
+        pxml.etag("br")
+        self.assertEqual(["<br />"], pxml.raw)
+        self.assertEqual("<br />", str(pxml))
+
+        pxml = PXML()
+        pxml.etag("img", [("src", "/world.png"), ("width", "640"), ("height", "480")])
+        self.assertEqual(['<img src="/world.png" width="640" height="480" />'], pxml.raw)
+        self.assertEqual('<img src="/world.png" width="640" height="480" />', str(pxml))
+
     def test_indent(self):
         pxml = PXML()
         pxml.indent()
