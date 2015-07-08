@@ -33,16 +33,23 @@ class PXML():
 
     @staticmethod
     def attributes(attr):
-        """Return the attribute list as a string."""
+        """Return the attribute list as a string.
+
+        attr: A list of 2-tuple strings.
+        """
         PXML.check_attr(attr)
         to_string = ""
         for name, value in attr:
             to_string += ' {}="{}"'.format(name, value)
         return to_string
 
-    def indent(self):
-        """Add indentation."""
-        self.insert(" " * self.spaces * self.depth)
+    def indent(self, repeat=1):
+        """Add indentation.
+
+        repeat: (Optional) The number of times to indent.  Default: 1
+        """
+        for i in range(repeat):
+            self.insert(" " * self.spaces * self.depth)
         return self
 
     def insert(self, string):
@@ -52,14 +59,22 @@ class PXML():
             self.raw.append(string)
         return self
 
-    def newline(self):
-        """Add a newline."""
-        self.insert("\n")
+    def newline(self, repeat=1):
+        """Add a newline.
+
+        repeat: (Optional) The number of newlines to add.  Default: 1
+        """
+        for i in range(repeat):
+            self.insert("\n")
         return self
 
     @contextmanager
     def tag(self, name, attr=None):
-        """Add tagged content."""
+        """Add tagged content.
+
+        name: Name of the tag.
+        attr: (Optional) A list of 2-tuple strings.
+        """
         if attr is None:
             attr = []
         self.indent().insert("<{}{}>".format(name, PXML.attributes(attr))).newline()
@@ -71,7 +86,11 @@ class PXML():
 
     @contextmanager
     def itag(self, name, attr=None):
-        """Add inline tagged content."""
+        """Add inline tagged content.
+
+        name: Name of the tag.
+        attr: (Optional) A list of 2-tuple strings.
+        """
         if attr is None:
             attr = []
         self.insert("<{}{}>".format(name, PXML.attributes(attr)))

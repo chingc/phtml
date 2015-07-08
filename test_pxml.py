@@ -80,6 +80,12 @@ class TestPXML(unittest.TestCase):
         self.assertEqual([], pxml.raw)
         self.assertEqual("", str(pxml))
 
+        pxml = PXML(4)
+        pxml.depth = 1
+        pxml.indent(5)
+        self.assertEqual([" " * pxml.spaces] * 5, pxml.raw)
+        self.assertEqual(" " * pxml.spaces * 5, str(pxml))
+
         for spaces in range(1, 5):
             for depth in range(1, 5):
                 pxml = PXML(spaces)
@@ -100,19 +106,19 @@ class TestPXML(unittest.TestCase):
 
         pxml.depth = 1
         pxml.indent().insert("One")
-        one = "    "
+        one = " " * pxml.spaces * pxml.depth
         self.assertEqual(["Hello", "World", one, "One"], pxml.raw)
         self.assertEqual("HelloWorld{}One".format(one), str(pxml))
 
         pxml.depth = 2
         pxml.indent().insert("Two")
-        two = "        "
+        two = " " * pxml.spaces * pxml.depth
         self.assertEqual(["Hello", "World", one, "One", two, "Two"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two".format(one, two), str(pxml))
 
         pxml.depth = 3
         pxml.indent().insert("Three")
-        three = "            "
+        three = " " * pxml.spaces * pxml.depth
         self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two{}Three".format(one, two, three), str(pxml))
 
@@ -133,6 +139,10 @@ class TestPXML(unittest.TestCase):
         pxml.newline().newline()
         self.assertEqual(["\n", "\n", "\n", "\n"], pxml.raw)
         self.assertEqual("\n\n\n\n", str(pxml))
+
+        pxml.newline(3)
+        self.assertEqual(["\n", "\n", "\n", "\n", "\n", "\n", "\n"], pxml.raw)
+        self.assertEqual("\n\n\n\n\n\n\n", str(pxml))
 
     def test_itag(self):
         pxml = PXML()

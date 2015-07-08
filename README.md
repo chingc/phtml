@@ -1,6 +1,6 @@
 # pxml
 
-A simple tool to help you write markup.
+A simple tool for writing markup.
 
 
 ## Requirements
@@ -19,7 +19,7 @@ pxml = PXML()          # create the object
 #### Constructor
 
 `PXML(width)` Creates a pxml object.
-- width: (Optional) The number of spaces used for indentation.  Default is 4.
+- width: (Optional) The number of spaces used for indentation.  Default: 4
 
 
 #### Methods
@@ -32,7 +32,8 @@ pxml = PXML()          # create the object
 ' id="skinner" class="principal"'
 ```
 
-`indent()` Add indentation.
+`indent(repeat)` Add indentation.
+- repeat: (Optional) The number of times to indent.  Default: 1
 
 ``` python
 >>> print(pxml.indent().insert("Bart!"))  # assuming the current indentation depth is 1
@@ -46,7 +47,8 @@ pxml = PXML()          # create the object
 Lisa
 ```
 
-`newline()` Add a newline.
+`newline(repeat)` Add a newline.
+- repeat: (Optional) The number of newlines to add.  Default: 1
 
 ``` python
 >>> print(pxml.insert('10 print "D\'oh!"').newline().insert("20 GOTO 10"))
@@ -111,4 +113,4 @@ Lisa
 
 Simplified BSD license.
 
-See the included `LICENSE` for more details.
+See the included `LICENSE` for details.
