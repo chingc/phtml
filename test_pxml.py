@@ -74,39 +74,22 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(' a="1" b="2"', PXML.attributes([("a", "1"), ("b", "2")]))
         self.assertEqual(' a="1" b="2" c="3"', PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]))
 
-    def test_clear(self):
-        pxml = PXML()
-
-        pxml.depth = 1
-        pxml.insert("Hello").insert("World")
-        self.assertEqual(1, pxml.depth)
-        self.assertEqual(["Hello", "World"], pxml.raw)
-        self.assertEqual("HelloWorld", str(pxml))
-
-        pxml.clear()
-        self.assertEqual(0, pxml.depth)
-        self.assertEqual([], pxml.raw)
-        self.assertEqual("", str(pxml))
-
     def test_indent(self):
         pxml = PXML()
-
         pxml.indent()
         self.assertEqual([], pxml.raw)
         self.assertEqual("", str(pxml))
 
         for spaces in range(1, 5):
-            pxml = PXML(spaces)
             for depth in range(1, 5):
+                pxml = PXML(spaces)
                 pxml.depth = depth
                 pxml.indent()
                 self.assertEqual([" " * spaces * depth], pxml.raw)
                 self.assertEqual(" " * spaces * depth, str(pxml))
-                pxml.clear()
 
     def test_insert(self):
         pxml = PXML(4)
-
         pxml.insert("Hello")
         self.assertEqual(["Hello"], pxml.raw)
         self.assertEqual("Hello", str(pxml))
@@ -139,7 +122,6 @@ class TestPXML(unittest.TestCase):
 
     def test_newline(self):
         pxml = PXML()
-
         pxml.newline()
         self.assertEqual(["\n"], pxml.raw)
         self.assertEqual("\n", str(pxml))
@@ -154,20 +136,19 @@ class TestPXML(unittest.TestCase):
 
     def test_itag(self):
         pxml = PXML()
-
         with pxml.itag("b"):
             pxml.insert("HelloWorld")
         self.assertEqual(["<b>", "HelloWorld", "</b>"], pxml.raw)
         self.assertEqual("<b>HelloWorld</b>", str(pxml))
 
-        pxml.clear()
+        pxml = PXML()
         with pxml.itag("b"):
             with pxml.itag("i"):
                 pxml.insert("HelloWorld")
         self.assertEqual(["<b>", "<i>", "HelloWorld", "</i>", "</b>"], pxml.raw)
         self.assertEqual("<b><i>HelloWorld</i></b>", str(pxml))
 
-        pxml.clear()
+        pxml = PXML()
         with pxml.itag("b"):
             with pxml.itag("i"):
                 with pxml.itag("u"):
@@ -175,7 +156,7 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(["<b>", "<i>", "<u>","HelloWorld", "</u>", "</i>", "</b>"], pxml.raw)
         self.assertEqual("<b><i><u>HelloWorld</u></i></b>", str(pxml))
 
-        pxml.clear()
+        pxml = PXML()
         with pxml.itag("b"):
             pxml.insert("Hello")
         with pxml.itag("b"):
@@ -183,13 +164,13 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(["<b>", "Hello", "</b>", "<b>", "World", "</b>"], pxml.raw)
         self.assertEqual("<b>Hello</b><b>World</b>", str(pxml))
 
-        pxml.clear()
+        pxml = PXML()
         with pxml.itag("span", [("id", "Hello")]):
             pxml.insert("Hello")
         self.assertEqual(['<span id="Hello">', "Hello", "</span>"], pxml.raw)
         self.assertEqual('<span id="Hello">Hello</span>', str(pxml))
 
-        pxml.clear()
+        pxml = PXML()
         with pxml.itag("span", [("id", "Hello")]):
             with pxml.itag("span", [("id", "World")]):
                 pxml.insert("HelloWorld")
@@ -197,13 +178,12 @@ class TestPXML(unittest.TestCase):
         self.assertEqual('<span id="Hello"><span id="World">HelloWorld</span></span>', str(pxml))
 
     def test_tag(self):
-        pxml = PXML(4)
-
         """
         <b>
             HelloWorld
         </b>
         """
+        pxml = PXML(4)
         with pxml.tag("b"):
             pxml.indent().insert("HelloWorld").newline()
         self.assertEqual(["<b>", "\n", "    ", "HelloWorld", "\n", "</b>", "\n"], pxml.raw)
@@ -216,7 +196,7 @@ class TestPXML(unittest.TestCase):
             </i>
         </b>
         """
-        pxml.clear()
+        pxml = PXML(4)
         with pxml.tag("b"):
             with pxml.tag("i"):
                 pxml.indent().insert("HelloWorld").newline()
@@ -232,7 +212,7 @@ class TestPXML(unittest.TestCase):
             </i>
         </b>
         """
-        pxml.clear()
+        pxml = PXML(4)
         with pxml.tag("b"):
             with pxml.tag("i"):
                 with pxml.tag("u"):
@@ -248,7 +228,7 @@ class TestPXML(unittest.TestCase):
             World
         </b>
         """
-        pxml.clear()
+        pxml = PXML(4)
         with pxml.tag("b"):
             pxml.indent().insert("Hello").newline()
         with pxml.tag("b"):
@@ -261,7 +241,7 @@ class TestPXML(unittest.TestCase):
             Hello
         </span>
         """
-        pxml.clear()
+        pxml = PXML(4)
         with pxml.tag("span", [("id", "Hello")]):
             pxml.indent().insert("Hello").newline()
         self.assertEqual(['<span id="Hello">', "\n", "    ", "Hello", "\n", "</span>", "\n"], pxml.raw)
@@ -274,7 +254,7 @@ class TestPXML(unittest.TestCase):
             </span>
         </span>
         """
-        pxml.clear()
+        pxml = PXML(4)
         with pxml.tag("span", [("id", "Hello")]):
             with pxml.tag("span", [("id", "World")]):
                 pxml.indent().insert("HelloWorld").newline()

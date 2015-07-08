@@ -40,12 +40,6 @@ class PXML():
             to_string += ' {}="{}"'.format(name, value)
         return to_string
 
-    def clear(self):
-        """Clear everything."""
-        self.raw.clear()
-        self.depth = 0
-        return self
-
     def indent(self):
         """Add indentation."""
         self.insert(" " * self.spaces * self.depth)
