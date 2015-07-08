@@ -1,106 +1,114 @@
-# simplemarkup
+# pxml
 
-A simple pretty print markup generator.
-
-This is something I created to help generate HTML for one of my other projects.  I wrote this because many of the tools already available were too complex or too big for my needs.  This will not check markup for validity, it simply creates pretty output for the input its given.
-
-
-## Sample Output
-
-DJRivals source  \[[index.html][1]\]<br />
+A simple tool to help you write markup.
 
 
 ## Requirements
 
-- Python
-
-Note: simplemarkup was written and tested under Python 3.3.0.  It should be able to run under Python 2.6.x, 2.7.x, and 3.x with little to no modifications.
+Python 3.x
 
 
-## Installation and Usage
+## Usage
 
-- Simply place the `simplemarkup.py` module into your project folder and import the module.
+``` python
+from pxml import PXML  # import the module
+pxml = PXML()          # create the object
+```
+
 
 #### Constructor
 
-`SimpleMarkup(width)` Creates a simplemarkup object.
+`PXML(width)` Creates a pxml object.
+- width: (Optional) The number of spaces used for indentation.  Default is 4.
 
-- width: (Optional) An integer to specify the number of spaces used for indentation.  Defaults to 4.
 
 #### Methods
 
-`output()` Returns the raw output.
+`attributes(attr)` Return the attribute list as a string.
+- attr: A list of 2-tuple strings.
 
-`raw(string)` Add a string exactly as given.
+``` python
+>>> pxml.attributes([("id", "skinner"), ("class", "principal")])
+' id="skinner" class="principal"'
+```
 
-- string: A string.
+`indent()` Add indentation.
 
-`empty(tag, attr)` Add an empty element.
+``` python
+>>> print(pxml.indent().insert("Bart!"))  # assuming the current indentation depth is 1
+    Bart!
+```
 
-- tag: An empty element tag as a string.
-- attr: (Optional) A list of 2-tuples strings.  Defaults to an empty list.
+`insert(string)` Add a string.
 
-`begin(tag, attr, value)` Add the opening tag of an element.
+``` python
+>>> print(pxml.insert("Lisa"))
+Lisa
+```
 
-- tag: An element tag as a string.
-- attr: (Optional) A list of 2-tuples strings.  Defaults to an empty list.
-- value: (Optional) The value that goes between an opening and closing element tag as a string.  Defaults to an empty string.
+`newline()` Add a newline.
 
-`end()` Add the closing tag of an element.
+``` python
+>>> print(pxml.insert('10 print "D\'oh!"').newline().insert("20 GOTO 10"))
+10 print "D'oh!"
+20 GOTO 10
+```
 
-Additional methods `rawln`, `emptyln`, `beginln`, and `endln` are available and are equivalent to the previously mentioned versions except these will append a newline.
+
+#### Context Managers
+
+`tag(name, attr)` Add tagged content.
+- name: Name of the tag.
+- attr: (Optional) A list of 2-tuple strings.
+
+``` python
+>>> with pxml.tag("div", [("class", "big")]):
+...     pxml.indent().insert("pxml!").newline()
+...
+>>> print(pxml)
+<div class="big">
+    Embiggened!
+</div>
+```
+
+`itag(name, attr)` Add inline tagged content.
+- name: Name of the tag.
+- attr: (Optional) A list of 2-tuple strings.
+
+``` python
+>>> with pxml.itag("beer"):
+...     pxml.insert("Duff!")
+...
+>>> print(pxml)
+<beer>Duff!</beer>
+```
 
 
-## Examples
+## Additional Example
 
-    >>> sm = SimpleMarkup()
-    >>> sm.raw("Hello, world!")
-    >>> print(sm.output())
-    Hello, world!
-    >>>
-
-    >>> sm = SimpleMarkup()
-    >>> sm.empty("img", [("src", "http://www.example.com/example.png"), ("width", "640"), ("height", "480")])
-    >>> print(sm.output())
-    <img src="http://www.example.com/example.png" width="640" height="480" />
-    >>>
-
-    >>> sm = SimpleMarkup()
-    >>> sm.begin("p", [("style", "font-variant: small-caps;")], "SimpleMarkup!")
-    >>> sm.end()
-    >>> print(sm.output())
-    <p style="font-variant: small-caps;">SimpleMarkup!</p>
-    >>>
-
-This example gives a taste of what makes simplemarkup really powerful.
-
-    >>> fruits = ["apple", "banana", "cherry", "mango", "orange", "pear", "watermelon"]
-    >>> sm.beginln("ul")
-    >>> for fruit in fruits:
-    ...     sm.begin("li", value=fruit)
-    ...     sm.endln()
-    >>> sm.end()
-    >>> print(sm.output())
-    <ul>
-        <li>apple</li>
-        <li>banana</li>
-        <li>cherry</li>
-        <li>mango</li>
-        <li>orange</li>
-        <li>pear</li>
-        <li>watermelon</li>
-    </ul>
-    >>>
-
-Note: simplemarkup allows method chaining.  The contents of the loop can be reduced to `sm.begin("li", value=fruit).endln()`.
+``` python
+>>> pxml = PXML()
+>>> family = ["homer", "marge", "bart", "lisa", "maggie"]
+>>> with pxml.tag("ul"):
+...     for member in family:
+...         pxml.indent()
+...         with pxml.itag("li"):
+...             pxml.insert(member)
+...         pxml.newline()
+...
+>>> print(pxml)
+<ul>
+    <li>homer</li>
+    <li>marge</li>
+    <li>bart</li>
+    <li>lisa</li>
+    <li>maggie</li>
+</ul>
+```
 
 
 ## License
 
-simplemarkup is distributed under the Simplified BSD license.  See [LICENSE][2] for more details.
+Simplified BSD license.
 
-
-
-
-[1]: https://raw.github.com/chingc/chingc.github.com/master/DJRivals/index.html
-[2]: https://github.com/chingc/simplemarkup/blob/master/LICENSE "License"
+See the included `LICENSE` for more details.
