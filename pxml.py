@@ -1,4 +1,4 @@
-"""Programmatic XML: Generate XML Programmatically"""
+"""Programmatic XML: Write XML Programmatically"""
 
 from contextlib import contextmanager
 
