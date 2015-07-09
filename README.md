@@ -1,4 +1,4 @@
-# pxml
+# pxml [![Build Status](https://travis-ci.org/chingc/pxml.svg?branch=master)](https://travis-ci.org/chingc/pxml)
 
 Programmatic XML is a simple tool that helps you write XML programmatically.
 
@@ -10,9 +10,14 @@ Programmatic XML is a simple tool that helps you write XML programmatically.
 - No dependencies
 
 
+## Support
+
+Tested on Python 3.3 and 3.4.
+
+
 ## Usage
 
-Actually, there's one dependency and it's Python 3.x.  Install Python and simply import the module.
+Simply import the module into your Python project.
 
 ``` python
 >>> from pxml import PXML
