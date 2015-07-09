@@ -1,3 +1,11 @@
+## 0.2.0
+2015-07-08
+
+- New: Unit testing!
+
+- Change: Completely rewritten to be smaller and easier to use.
+
+
 ## 0.1.0
 2015-04-19
 
