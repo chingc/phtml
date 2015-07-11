@@ -1,3 +1,5 @@
+"""Unit Tests"""
+
 import unittest
 from itertools import permutations
 
@@ -8,8 +10,10 @@ class TestPXML(unittest.TestCase):
     def setUp(self):
         pass
 
+
     def tearDown(self):
         pass
+
 
     def test_check_str(self):
         types = [None, True, 1, "", "string", [], (), {}]
@@ -22,6 +26,7 @@ class TestPXML(unittest.TestCase):
         for element in [t for t in types if not isinstance(t, str)]:
             with self.assertRaises(TypeError):
                 PXML.check_str(element)
+
 
     def test_check_attr(self):
         types = [None, True, 1, "", "string", [], (), {}]
@@ -68,11 +73,13 @@ class TestPXML(unittest.TestCase):
             with self.assertRaises(TypeError):
                 PXML.check_attr([element])
 
+
     def test_attributes(self):
         self.assertEqual("", PXML.attributes([]))
         self.assertEqual(' hello="world"', PXML.attributes([("hello", "world")]))
         self.assertEqual(' a="1" b="2"', PXML.attributes([("a", "1"), ("b", "2")]))
         self.assertEqual(' a="1" b="2" c="3"', PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]))
+
 
     def test_etag(self):
         pxml = PXML()
@@ -84,6 +91,7 @@ class TestPXML(unittest.TestCase):
         pxml.etag("img", [("src", "/world.png"), ("width", "640"), ("height", "480")])
         self.assertEqual(['<img src="/world.png" width="640" height="480" />'], pxml.raw)
         self.assertEqual('<img src="/world.png" width="640" height="480" />', str(pxml))
+
 
     def test_indent(self):
         pxml = PXML()
@@ -104,6 +112,7 @@ class TestPXML(unittest.TestCase):
                 pxml.indent()
                 self.assertEqual([" " * spaces * depth], pxml.raw)
                 self.assertEqual(" " * spaces * depth, str(pxml))
+
 
     def test_insert(self):
         pxml = PXML(4)
@@ -137,6 +146,7 @@ class TestPXML(unittest.TestCase):
         self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three", "Bye", "Bye"], pxml.raw)
         self.assertEqual("HelloWorld{}One{}Two{}ThreeByeBye".format(one, two, three), str(pxml))
 
+
     def test_newline(self):
         pxml = PXML()
         pxml.newline()
@@ -154,6 +164,7 @@ class TestPXML(unittest.TestCase):
         pxml.newline(3)
         self.assertEqual(["\n", "\n", "\n", "\n", "\n", "\n", "\n"], pxml.raw)
         self.assertEqual("\n\n\n\n\n\n\n", str(pxml))
+
 
     def test_itag(self):
         pxml = PXML()
@@ -197,6 +208,7 @@ class TestPXML(unittest.TestCase):
                 pxml.insert("HelloWorld")
         self.assertEqual(['<span id="Hello">', '<span id="World">', "HelloWorld", "</span>", "</span>"], pxml.raw)
         self.assertEqual('<span id="Hello"><span id="World">HelloWorld</span></span>', str(pxml))
+
 
     def test_tag(self):
         """

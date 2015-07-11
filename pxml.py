@@ -9,18 +9,33 @@ class PXML():
         self.depth = 0
         self.raw = []
 
+
     def __str__(self):
         return "".join(self.raw)
 
+
     @staticmethod
     def check_str(obj):
-        """Raise a TypeError if the given object is not a string."""
+        """Check if an object is a string.
+
+        obj -- The object to check.
+
+        Success => None
+        Failure => Raise TypeError
+        """
         if not isinstance(obj, str):
             raise TypeError("Expected {}, but got {}".format(type(""), type(obj)))
 
+
     @staticmethod
     def check_attr(obj):
-        """Raise a TypeError if the given object is not a list of 2-tuple strings."""
+        """Check if an object is a list of 2-tuple strings.
+
+        obj -- The object to check.
+
+        Success => None
+        Failure => Raise TypeError
+        """
         if not isinstance(obj, list):
             raise TypeError("Expected {}, but got {}".format(type([]), type(obj)))
         for element in obj:
@@ -31,11 +46,14 @@ class PXML():
             if not (isinstance(element[0], str) and isinstance(element[1], str)):
                 raise TypeError("Expected all tuple elements to be {}".format(type("")))
 
+
     @staticmethod
     def attributes(attr):
-        """Return the attribute list as a string.
+        """Stringify an attribute list.
 
-        attr: A list of 2-tuple strings.
+        attr -- A list of 2-tuple strings.
+
+        => The string representation of attr.
         """
         PXML.check_attr(attr)
         to_string = ""
@@ -43,48 +61,66 @@ class PXML():
             to_string += ' {}="{}"'.format(name, value)
         return to_string
 
+
     def etag(self, name, attr=None):
         """Add empty tag content.
 
-        name: Name of the tag.
-        attr: (Optional) A list of 2-tuple strings.
+        name -- The name of the tag.
+        attr -- A list of 2-tuple strings.  Default: None
+
+        => self
         """
         if attr is None:
             attr = []
         self.insert("<{}{} />".format(name, PXML.attributes(attr)))
         return self
 
+
     def indent(self, repeat=1):
         """Add indentation.
 
-        repeat: (Optional) The number of times to indent.  Default: 1
+        repeat -- The number of times to indent.  Default: 1
+
+        => self
         """
         for i in range(repeat):
             self.insert(" " * self.spaces * self.depth)
         return self
 
+
     def insert(self, string):
-        """Add a string."""
+        """Add a string.
+
+        string -- The string to add.
+
+        => self
+        """
         self.check_str(string)
         if len(string) > 0:
             self.raw.append(string)
         return self
 
+
     def newline(self, repeat=1):
         """Add a newline.
 
-        repeat: (Optional) The number of newlines to add.  Default: 1
+        repeat -- The number of newlines to add.  Default: 1
+
+        => self
         """
         for i in range(repeat):
             self.insert("\n")
         return self
 
+
     @contextmanager
     def tag(self, name, attr=None):
         """Add tag content.
 
-        name: Name of the tag.
-        attr: (Optional) A list of 2-tuple strings.
+        name -- The name of the tag.
+        attr -- A list of 2-tuple strings.  Default: None
+
+        => self
         """
         if attr is None:
             attr = []
@@ -95,12 +131,15 @@ class PXML():
         self.indent().insert("</{}>".format(name)).newline()
         return self
 
+
     @contextmanager
     def itag(self, name, attr=None):
         """Add inline tag content.
 
-        name: Name of the tag.
-        attr: (Optional) A list of 2-tuple strings.
+        name -- The name of the tag.
+        attr -- A list of 2-tuple strings.  Default: None
+
+        => self
         """
         if attr is None:
             attr = []
