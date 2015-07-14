@@ -1,36 +1,45 @@
+## 0.2.1
+2015-07-13
+
+- Changed: Minor improvements and code cleanup.
+
+
+- Fixed: Changelog didn't mention new name of project.
+
+
 ## 0.2.0
 2015-07-08
 
-- New: Unit testing!
+- Added: Unit testing!
 
 
-- Change: Completely rewritten to be smaller and easier to use.
-- Change: Project renamed to pxml.
+- Changed: Completely rewritten to be smaller and easier to use.
+- Changed: Project renamed to pxml.
 
 
 ## 0.1.0
 2015-04-19
 
-- Change: Version 2.1 was re-released using semantic versioning as 0.1.0.  http://semver.org/
+- Changed: Version 2.1 was re-released using semantic versioning as 0.1.0.  http://semver.org/
 
 
 ## 2.1
 2012-11-07
 
-- Fix: Value wasn't placed on a newline when using beginln().
+- Fixed: Value wasn't placed on a newline when using beginln().
 
 
 ## 2.0
 2012-11-06
 
-- Change: Attributes are now specified as list of 2-tuple strings rather than a list of strings.
-- Change: Project renamed to SimpleMarkup.
+- Changed: Attributes are now specified as list of 2-tuple strings rather than a list of strings.
+- Changed: Project renamed to SimpleMarkup.
 
 
 ## 1.1
 2012-10-22
 
-- New: Added convenience functions so the newline argument is no longer necessary.
+- Added: Convenience functions so the newline argument is no longer necessary.
 
 
 ## 1.0
