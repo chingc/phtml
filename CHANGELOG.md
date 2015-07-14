@@ -2,8 +2,6 @@
 2015-07-13
 
 - Changed: Minor improvements and code cleanup.
-
-
 - Fixed: Changelog didn't mention new name of project.
 
 
@@ -11,8 +9,6 @@
 2015-07-08
 
 - Added: Unit testing!
-
-
 - Changed: Completely rewritten to be smaller and easier to use.
 - Changed: Project renamed to pxml.
 
