@@ -3,7 +3,9 @@
 
 - New: Unit testing!
 
+
 - Change: Completely rewritten to be smaller and easier to use.
+- Change: Project renamed to pxml.
 
 
 ## 0.1.0
