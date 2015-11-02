@@ -1,23 +1,11 @@
 # pxml [![Build Status](https://travis-ci.org/chingc/pxml.svg?branch=master)](https://travis-ci.org/chingc/pxml)
 
-Programmatic XML is a simple tool that helps you write XML programmatically.
-
-
-## Features
-
-- Easy to use
-- Single module
-- No dependencies
-
-
-## Support
-
-Tested on Python 3.3 and 3.4.
+Programmatic XML is a simple tool that helps you generate XML programmatically.
 
 
 ## Usage
 
-Simply import the module into your Python project.
+Simply import the module into your Python project.  There are no dependencies.
 
 ``` python
 >>> from pxml import PXML
@@ -35,13 +23,13 @@ Simply import the module into your Python project.
 
 #### Constructor
 
-`PXML(width)` : Creates a pxml object.
+`PXML(width)` -- Create a pxml object.
 - width: (Optional) The number of spaces used for indentation.  Default: 4
 
 
 #### Methods
 
-`attributes(attr)` : Return the attribute list as a string.
+`attributes(attr)` -- Return the attribute list as a string.
 - attr: A list of 2-tuple strings.
 
 ``` python
@@ -49,7 +37,7 @@ Simply import the module into your Python project.
 ' id="skinner" class="principal"'
 ```
 
-`etag(name, attr)` : Add empty tag content.
+`etag(name, attr)` -- Add empty tag content.
 - name: Name of the tag.
 - attr: (Optional) A list of 2-tuple strings.
 
@@ -59,7 +47,7 @@ Simply import the module into your Python project.
 <img src="/channel_6/homer_file_photo.png" width="640" height="480" />
 ```
 
-`indent(repeat)` : Add indentation.
+`indent(repeat)` -- Add indentation.
 - repeat: (Optional) The number of times to indent.  Default: 1
 
 ``` python
@@ -67,14 +55,14 @@ Simply import the module into your Python project.
     Bart!
 ```
 
-`insert(string)` : Add a string.
+`insert(string)` -- Add a string.
 
 ``` python
 >>> print(pxml.insert("Lisa"))
 Lisa
 ```
 
-`newline(repeat)` : Add a newline.
+`newline(repeat)` -- Add a newline.
 - repeat: (Optional) The number of newlines to add.  Default: 1
 
 ``` python
@@ -86,13 +74,13 @@ Lisa
 
 #### Context Managers
 
-`tag(name, attr)` : Add tag content.
+`tag(name, attr)` -- Add tag content.
 - name: Name of the tag.
 - attr: (Optional) A list of 2-tuple strings.
 
 ``` python
 >>> with pxml.tag("div", [("class", "big")]):
-...     pxml.indent().insert("pxml!").newline()
+...     pxml.indent().insert("Embiggened!").newline()
 ...
 >>> print(pxml)
 <div class="big">
@@ -100,7 +88,7 @@ Lisa
 </div>
 ```
 
-`itag(name, attr)` : Add inline tag content.
+`itag(name, attr)` -- Add inline tag content.
 - name: Name of the tag.
 - attr: (Optional) A list of 2-tuple strings.
 
@@ -115,14 +103,14 @@ Lisa
 
 #### Instance Variables
 
-`spaces` : The number of spaces used for indentation.
+`spaces` -- The number of spaces used for indentation.
 
-`depth` : The current indentation depth.
+`depth` -- The current indentation depth.
 
-`raw` : The array of elements that will be outputted.
+`raw` -- The array of elements that will be outputted.
 
 
-## Extra Example
+## Example
 
 ``` python
 >>> pxml = PXML()
@@ -148,5 +136,3 @@ Lisa
 ## License
 
 Simplified BSD license.
-
-See the included `LICENSE` for details.
