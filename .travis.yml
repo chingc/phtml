@@ -3,5 +3,7 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-  - "nightly"
-script: python test_pxml.py -v
+install:
+  - pip install coveralls
+script: coverage run test_pxml.py -v
+after_success: coveralls
