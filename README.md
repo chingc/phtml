@@ -1,6 +1,6 @@
-# pxml
+[![Build Status](https://travis-ci.org/chingc/pxml.svg?branch=master)](https://travis-ci.org/chingc/pxml) [![Coverage Status](https://coveralls.io/repos/chingc/pxml/badge.svg?branch=master&service=github)](https://coveralls.io/github/chingc/pxml?branch=master) [![Code Climate](https://codeclimate.com/github/chingc/pxml/badges/gpa.svg)](https://codeclimate.com/github/chingc/pxml)
 
-[![Build Status](https://travis-ci.org/chingc/pxml.svg?branch=master)](https://travis-ci.org/chingc/pxml) [![Coverage Status](https://coveralls.io/repos/chingc/pxml/badge.svg?branch=master&service=github)](https://coveralls.io/github/chingc/pxml?branch=master)
+# pxml
 
 Programmatic XML is a simple tool that helps you generate XML programmatically.
 
