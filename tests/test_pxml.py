@@ -1,10 +1,15 @@
 """Unit Tests"""
 
+import sys
 import unittest
+
 from itertools import permutations
+from pathlib import Path
 
-from pxml import PXML
+here = Path(__file__).resolve()
+sys.path.append(str(here.parent.parent.joinpath("src")))
 
+from pxml import PXML  # pylint: disable=import-error
 
 class TestPXML(unittest.TestCase):
     def setUp(self):
