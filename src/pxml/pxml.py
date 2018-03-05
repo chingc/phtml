@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 
 class PXML():
+    """Main class."""
     def __init__(self, spaces=4):
         self.spaces = spaces
         self.depth = 0
@@ -83,7 +84,7 @@ class PXML():
 
         => self
         """
-        for i in range(repeat):
+        for _ in range(repeat):
             self.insert(" " * self.spaces * self.depth)
         return self
 
@@ -96,7 +97,7 @@ class PXML():
         => self
         """
         self.check_str(string)
-        if len(string) > 0:
+        if string:
             self.raw.append(string)
         return self
 
@@ -108,7 +109,7 @@ class PXML():
 
         => self
         """
-        for i in range(repeat):
+        for _ in range(repeat):
             self.insert("\n")
         return self
 
