@@ -1,304 +1,289 @@
-"""Unit Tests"""
-
-import sys
-import unittest
+"""Tests"""
 
 from itertools import permutations
-from pathlib import Path
 
-here = Path(__file__).resolve()
-sys.path.append(str(here.parent.parent.joinpath("src")))
-
-from pxml import PXML  # pylint: disable=import-error
-
-class TestPXML(unittest.TestCase):
-    def setUp(self):
-        pass
+import pytest
 
 
-    def tearDown(self):
-        pass
+def test_check_str(PXML, types):
+    """test"""
+    # pass: string
+    for element in [t for t in types if isinstance(t, str)]:
+        assert PXML.check_str(element) is None
+
+    # fail: non-string
+    for element in [t for t in types if not isinstance(t, str)]:
+        with pytest.raises(TypeError):
+            PXML.check_str(element)
 
 
-    def test_check_str(self):
-        types = [None, True, 1, "", "string", [], (), {}]
+def test_check_attr(PXML, types):
+    """test"""
+    # pass: empty list
+    assert PXML.check_attr([]) is None
 
-        # pass: string
-        for element in [t for t in types if isinstance(t, str)]:
-            self.assertIsNone(PXML.check_str(element))
+    # pass: list of 2-tuple (tuple elements are strings)
+    for element in permutations([t for t in types if isinstance(t, str)], 2):
+        assert PXML.check_attr([element]) is None
 
-        # fail: non-string
-        for element in [t for t in types if not isinstance(t, str)]:
-            with self.assertRaises(TypeError):
-                PXML.check_str(element)
+    # fail: non-list
+    for element in [t for t in types if not isinstance(t, list)]:
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
+    # fail: 1 element list (element is not a 2-tuple of strings)
+    for element in permutations(types, 1):
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
-    def test_check_attr(self):
-        types = [None, True, 1, "", "string", [], (), {}]
+    # fail: 2 element list (elements are not a 2-tuple of strings)
+    for element in permutations(types, 2):
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
-        # pass: empty list
-        self.assertIsNone(PXML.check_attr([]))
+    # fail: 3 element list (elements are not a 2-tuple of strings)
+    for element in permutations(types, 3):
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
-        # pass: list of 2-tuple (tuple elements are strings)
-        for element in permutations([t for t in types if isinstance(t, str)], 2):
-            self.assertIsNone(PXML.check_attr([element]))
+    # fail: list of 1-tuple
+    for element in permutations(types, 1):
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
-        # fail: non-list
-        for element in [t for t in types if not isinstance(t, list)]:
-            with self.assertRaises(TypeError):
-                PXML.check_attr(element)
+    # fail: list of 2-tuple (tuple elements are non-strings)
+    for element in permutations([t for t in types if not isinstance(t, str)], 2):
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
-        # fail: 1 element list (element is not a 2-tuple of strings)
-        for element in permutations(types, 1):
-            with self.assertRaises(TypeError):
-                PXML.check_attr(list(element))
-
-        # fail: 2 element list (elements are not a 2-tuple of strings)
-        for element in permutations(types, 2):
-            with self.assertRaises(TypeError):
-                PXML.check_attr(list(element))
-
-        # fail: 3 element list (elements are not a 2-tuple of strings)
-        for element in permutations(types, 3):
-            with self.assertRaises(TypeError):
-                PXML.check_attr(list(element))
-
-        # fail: list of 1-tuple
-        for element in permutations(types, 1):
-            with self.assertRaises(TypeError):
-                PXML.check_attr([element])
-
-        # fail: list of 2-tuple (tuple elements are non-strings)
-        for element in permutations([t for t in types if not isinstance(t, str)], 2):
-            with self.assertRaises(TypeError):
-                PXML.check_attr([element])
-
-        # fail: list of 3-tuple
-        for element in permutations(types, 3):
-            with self.assertRaises(TypeError):
-                PXML.check_attr([element])
+    # fail: list of 3-tuple
+    for element in permutations(types, 3):
+        with pytest.raises(TypeError):
+            PXML.check_attr(element)
 
 
-    def test_attributes(self):
-        self.assertEqual("", PXML.attributes([]))
-        self.assertEqual(' hello="world"', PXML.attributes([("hello", "world")]))
-        self.assertEqual(' a="1" b="2"', PXML.attributes([("a", "1"), ("b", "2")]))
-        self.assertEqual(' a="1" b="2" c="3"', PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]))
+def test_attributes(PXML):
+    """test"""
+    assert PXML.attributes([]) == ""
+    assert PXML.attributes([("hello", "world")]) == ' hello="world"'
+    assert PXML.attributes([("a", "1"), ("b", "2")]) == ' a="1" b="2"'
+    assert PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]) == ' a="1" b="2" c="3"'
 
 
-    def test_etag(self):
-        pxml = PXML()
-        pxml.etag("br")
-        self.assertEqual(["<br />"], pxml.raw)
-        self.assertEqual("<br />", str(pxml))
+def test_etag(PXML):
+    """test"""
+    pxml = PXML()
+    pxml.etag("br")
+    assert pxml.raw == ["<br />"]
+    assert str(pxml) == "<br />"
 
-        pxml = PXML()
-        pxml.etag("img", [("src", "/world.png"), ("width", "640"), ("height", "480")])
-        self.assertEqual(['<img src="/world.png" width="640" height="480" />'], pxml.raw)
-        self.assertEqual('<img src="/world.png" width="640" height="480" />', str(pxml))
-
-
-    def test_indent(self):
-        pxml = PXML()
-        pxml.indent()
-        self.assertEqual([], pxml.raw)
-        self.assertEqual("", str(pxml))
-
-        pxml = PXML(4)
-        pxml.depth = 1
-        pxml.indent(5)
-        self.assertEqual([" " * pxml.spaces] * 5, pxml.raw)
-        self.assertEqual(" " * pxml.spaces * 5, str(pxml))
-
-        for spaces in range(1, 5):
-            for depth in range(1, 5):
-                pxml = PXML(spaces)
-                pxml.depth = depth
-                pxml.indent()
-                self.assertEqual([" " * spaces * depth], pxml.raw)
-                self.assertEqual(" " * spaces * depth, str(pxml))
+    pxml = PXML()
+    pxml.etag("img", [("src", "/world.png"), ("width", "640"), ("height", "480")])
+    assert pxml.raw == ['<img src="/world.png" width="640" height="480" />']
+    assert str(pxml) == '<img src="/world.png" width="640" height="480" />'
 
 
-    def test_insert(self):
-        pxml = PXML(4)
-        pxml.insert("Hello")
-        self.assertEqual(["Hello"], pxml.raw)
-        self.assertEqual("Hello", str(pxml))
+def test_indent(PXML):
+    """test"""
+    pxml = PXML()
+    pxml.indent()
+    assert pxml.raw == []
+    assert str(pxml) == ""
 
-        pxml.insert("World")
-        self.assertEqual(["Hello", "World"], pxml.raw)
-        self.assertEqual("HelloWorld", str(pxml))
+    pxml = PXML(4)
+    pxml.depth = 1
+    pxml.indent(5)
+    assert pxml.raw == [" " * pxml.spaces] * 5
+    assert str(pxml) == " " * pxml.spaces * 5
 
-        pxml.depth = 1
-        pxml.indent().insert("One")
-        one = " " * pxml.spaces * pxml.depth
-        self.assertEqual(["Hello", "World", one, "One"], pxml.raw)
-        self.assertEqual("HelloWorld{}One".format(one), str(pxml))
-
-        pxml.depth = 2
-        pxml.indent().insert("Two")
-        two = " " * pxml.spaces * pxml.depth
-        self.assertEqual(["Hello", "World", one, "One", two, "Two"], pxml.raw)
-        self.assertEqual("HelloWorld{}One{}Two".format(one, two), str(pxml))
-
-        pxml.depth = 3
-        pxml.indent().insert("Three")
-        three = " " * pxml.spaces * pxml.depth
-        self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three"], pxml.raw)
-        self.assertEqual("HelloWorld{}One{}Two{}Three".format(one, two, three), str(pxml))
-
-        pxml.insert("Bye").insert("Bye")
-        self.assertEqual(["Hello", "World", one, "One", two, "Two", three, "Three", "Bye", "Bye"], pxml.raw)
-        self.assertEqual("HelloWorld{}One{}Two{}ThreeByeBye".format(one, two, three), str(pxml))
+    for spaces in range(1, 5):
+        for depth in range(1, 5):
+            pxml = PXML(spaces)
+            pxml.depth = depth
+            pxml.indent()
+            assert pxml.raw == [" " * spaces * depth]
+            assert str(pxml) == " " * spaces * depth
 
 
-    def test_newline(self):
-        pxml = PXML()
-        pxml.newline()
-        self.assertEqual(["\n"], pxml.raw)
-        self.assertEqual("\n", str(pxml))
+def test_insert(PXML):
+    """test"""
+    pxml = PXML(4)
+    pxml.insert("Hello")
+    assert pxml.raw == ["Hello"]
+    assert str(pxml) == "Hello"
 
-        pxml.newline()
-        self.assertEqual(["\n", "\n"], pxml.raw)
-        self.assertEqual("\n\n", str(pxml))
+    pxml.insert("World")
+    assert pxml.raw == ["Hello", "World"]
+    assert str(pxml) == "HelloWorld"
 
-        pxml.newline().newline()
-        self.assertEqual(["\n", "\n", "\n", "\n"], pxml.raw)
-        self.assertEqual("\n\n\n\n", str(pxml))
+    pxml.depth = 1
+    pxml.indent().insert("One")
+    one = " " * pxml.spaces * pxml.depth
+    assert pxml.raw == ["Hello", "World", one, "One"]
+    assert str(pxml) == "HelloWorld{}One".format(one)
 
-        pxml.newline(3)
-        self.assertEqual(["\n", "\n", "\n", "\n", "\n", "\n", "\n"], pxml.raw)
-        self.assertEqual("\n\n\n\n\n\n\n", str(pxml))
+    pxml.depth = 2
+    pxml.indent().insert("Two")
+    two = " " * pxml.spaces * pxml.depth
+    assert pxml.raw == ["Hello", "World", one, "One", two, "Two"]
+    assert str(pxml) == "HelloWorld{}One{}Two".format(one, two)
+
+    pxml.depth = 3
+    pxml.indent().insert("Three")
+    three = " " * pxml.spaces * pxml.depth
+    assert pxml.raw == ["Hello", "World", one, "One", two, "Two", three, "Three"]
+    assert str(pxml) == "HelloWorld{}One{}Two{}Three".format(one, two, three)
+
+    pxml.insert("Bye").insert("Bye")
+    assert pxml.raw == ["Hello", "World", one, "One", two, "Two", three, "Three", "Bye", "Bye"]
+    assert str(pxml) == "HelloWorld{}One{}Two{}ThreeByeBye".format(one, two, three)
 
 
-    def test_itag(self):
-        pxml = PXML()
-        with pxml.itag("b"):
+def test_newline(PXML):
+    """test"""
+    pxml = PXML()
+    pxml.newline()
+    assert pxml.raw == ["\n"]
+    assert str(pxml) == "\n"
+
+    pxml.newline()
+    assert pxml.raw == ["\n", "\n"]
+    assert str(pxml) == "\n\n"
+
+    pxml.newline().newline()
+    assert pxml.raw == ["\n", "\n", "\n", "\n"]
+    assert str(pxml) == "\n\n\n\n"
+
+    pxml.newline(3)
+    assert pxml.raw == ["\n", "\n", "\n", "\n", "\n", "\n", "\n"]
+    assert str(pxml) == "\n\n\n\n\n\n\n"
+
+
+def test_itag(PXML):
+    """test"""
+    pxml = PXML()
+    with pxml.itag("b"):
+        pxml.insert("HelloWorld")
+    assert pxml.raw == ["<b>", "HelloWorld", "</b>"]
+    assert str(pxml) == "<b>HelloWorld</b>"
+
+    pxml = PXML()
+    with pxml.itag("b"):
+        with pxml.itag("i"):
             pxml.insert("HelloWorld")
-        self.assertEqual(["<b>", "HelloWorld", "</b>"], pxml.raw)
-        self.assertEqual("<b>HelloWorld</b>", str(pxml))
+    assert pxml.raw == ["<b>", "<i>", "HelloWorld", "</i>", "</b>"]
+    assert str(pxml) == "<b><i>HelloWorld</i></b>"
 
-        pxml = PXML()
-        with pxml.itag("b"):
-            with pxml.itag("i"):
+    pxml = PXML()
+    with pxml.itag("b"):
+        with pxml.itag("i"):
+            with pxml.itag("u"):
                 pxml.insert("HelloWorld")
-        self.assertEqual(["<b>", "<i>", "HelloWorld", "</i>", "</b>"], pxml.raw)
-        self.assertEqual("<b><i>HelloWorld</i></b>", str(pxml))
+    assert pxml.raw == ["<b>", "<i>", "<u>", "HelloWorld", "</u>", "</i>", "</b>"]
+    assert str(pxml) == "<b><i><u>HelloWorld</u></i></b>"
 
-        pxml = PXML()
-        with pxml.itag("b"):
-            with pxml.itag("i"):
-                with pxml.itag("u"):
-                    pxml.insert("HelloWorld")
-        self.assertEqual(["<b>", "<i>", "<u>","HelloWorld", "</u>", "</i>", "</b>"], pxml.raw)
-        self.assertEqual("<b><i><u>HelloWorld</u></i></b>", str(pxml))
+    pxml = PXML()
+    with pxml.itag("b"):
+        pxml.insert("Hello")
+    with pxml.itag("b"):
+        pxml.insert("World")
+    assert pxml.raw == ["<b>", "Hello", "</b>", "<b>", "World", "</b>"]
+    assert str(pxml) == "<b>Hello</b><b>World</b>"
 
-        pxml = PXML()
-        with pxml.itag("b"):
-            pxml.insert("Hello")
-        with pxml.itag("b"):
-            pxml.insert("World")
-        self.assertEqual(["<b>", "Hello", "</b>", "<b>", "World", "</b>"], pxml.raw)
-        self.assertEqual("<b>Hello</b><b>World</b>", str(pxml))
+    pxml = PXML()
+    with pxml.itag("span", [("id", "Hello")]):
+        pxml.insert("Hello")
+    assert pxml.raw == ['<span id="Hello">', "Hello", "</span>"]
+    assert str(pxml) == '<span id="Hello">Hello</span>'
 
-        pxml = PXML()
-        with pxml.itag("span", [("id", "Hello")]):
-            pxml.insert("Hello")
-        self.assertEqual(['<span id="Hello">', "Hello", "</span>"], pxml.raw)
-        self.assertEqual('<span id="Hello">Hello</span>', str(pxml))
-
-        pxml = PXML()
-        with pxml.itag("span", [("id", "Hello")]):
-            with pxml.itag("span", [("id", "World")]):
-                pxml.insert("HelloWorld")
-        self.assertEqual(['<span id="Hello">', '<span id="World">', "HelloWorld", "</span>", "</span>"], pxml.raw)
-        self.assertEqual('<span id="Hello"><span id="World">HelloWorld</span></span>', str(pxml))
+    pxml = PXML()
+    with pxml.itag("span", [("id", "Hello")]):
+        with pxml.itag("span", [("id", "World")]):
+            pxml.insert("HelloWorld")
+    assert pxml.raw == ['<span id="Hello">', '<span id="World">', "HelloWorld", "</span>", "</span>"]
+    assert str(pxml) == '<span id="Hello"><span id="World">HelloWorld</span></span>'
 
 
-    def test_tag(self):
-        """
-        <b>
+def test_tag(PXML):
+    """
+    <b>
+        HelloWorld
+    </b>
+    """
+    pxml = PXML(4)
+    with pxml.tag("b"):
+        pxml.indent().insert("HelloWorld").newline()
+    assert pxml.raw == ["<b>", "\n", "    ", "HelloWorld", "\n", "</b>", "\n"]
+    assert str(pxml) == "<b>\n    HelloWorld\n</b>\n"
+
+    """
+    <b>
+        <i>
             HelloWorld
-        </b>
-        """
-        pxml = PXML(4)
-        with pxml.tag("b"):
+        </i>
+    </b>
+    """
+    pxml = PXML(4)
+    with pxml.tag("b"):
+        with pxml.tag("i"):
             pxml.indent().insert("HelloWorld").newline()
-        self.assertEqual(["<b>", "\n", "    ", "HelloWorld", "\n", "</b>", "\n"], pxml.raw)
-        self.assertEqual("<b>\n    HelloWorld\n</b>\n", str(pxml))
+    assert pxml.raw == ["<b>", "\n", "    ", "<i>", "\n", "        ", "HelloWorld", "\n", "    ", "</i>", "\n", "</b>", "\n"]
+    assert str(pxml) == "<b>\n    <i>\n        HelloWorld\n    </i>\n</b>\n"
 
-        """
-        <b>
-            <i>
+    """
+    <b>
+        <i>
+            <u>
                 HelloWorld
-            </i>
-        </b>
-        """
-        pxml = PXML(4)
-        with pxml.tag("b"):
-            with pxml.tag("i"):
+            </u>
+        </i>
+    </b>
+    """
+    pxml = PXML(4)
+    with pxml.tag("b"):
+        with pxml.tag("i"):
+            with pxml.tag("u"):
                 pxml.indent().insert("HelloWorld").newline()
-        self.assertEqual(["<b>", "\n", "    ", "<i>", "\n", "        ", "HelloWorld", "\n", "    ", "</i>", "\n", "</b>", "\n"], pxml.raw)
-        self.assertEqual("<b>\n    <i>\n        HelloWorld\n    </i>\n</b>\n", str(pxml))
+    assert pxml.raw == ["<b>", "\n", "    ", "<i>", "\n", "        ", "<u>", "\n", "            ", "HelloWorld", "\n", "        ", "</u>", "\n", "    ", "</i>", "\n", "</b>", "\n"]
+    assert str(pxml) == "<b>\n    <i>\n        <u>\n            HelloWorld\n        </u>\n    </i>\n</b>\n"
 
-        """
-        <b>
-            <i>
-                <u>
-                    HelloWorld
-                </u>
-            </i>
-        </b>
-        """
-        pxml = PXML(4)
-        with pxml.tag("b"):
-            with pxml.tag("i"):
-                with pxml.tag("u"):
-                    pxml.indent().insert("HelloWorld").newline()
-        self.assertEqual(["<b>", "\n", "    ", "<i>", "\n", "        ", "<u>", "\n", "            ", "HelloWorld", "\n", "        ", "</u>", "\n", "    ", "</i>", "\n", "</b>", "\n"], pxml.raw)
-        self.assertEqual("<b>\n    <i>\n        <u>\n            HelloWorld\n        </u>\n    </i>\n</b>\n", str(pxml))
+    """
+    <b>
+        Hello
+    </b>
+    <b>
+        World
+    </b>
+    """
+    pxml = PXML(4)
+    with pxml.tag("b"):
+        pxml.indent().insert("Hello").newline()
+    with pxml.tag("b"):
+        pxml.indent().insert("World").newline()
+    assert pxml.raw == ["<b>", "\n", "    ", "Hello", "\n", "</b>", "\n", "<b>", "\n", "    ", "World", "\n", "</b>", "\n"]
+    assert str(pxml) == "<b>\n    Hello\n</b>\n<b>\n    World\n</b>\n"
 
-        """
-        <b>
-            Hello
-        </b>
-        <b>
-            World
-        </b>
-        """
-        pxml = PXML(4)
-        with pxml.tag("b"):
-            pxml.indent().insert("Hello").newline()
-        with pxml.tag("b"):
-            pxml.indent().insert("World").newline()
-        self.assertEqual(["<b>", "\n", "    ", "Hello", "\n", "</b>", "\n", "<b>", "\n", "    ", "World", "\n", "</b>", "\n"], pxml.raw)
-        self.assertEqual("<b>\n    Hello\n</b>\n<b>\n    World\n</b>\n", str(pxml))
+    """
+    <span id="Hello">
+        Hello
+    </span>
+    """
+    pxml = PXML(4)
+    with pxml.tag("span", [("id", "Hello")]):
+        pxml.indent().insert("Hello").newline()
+    assert pxml.raw == ['<span id="Hello">', "\n", "    ", "Hello", "\n", "</span>", "\n"]
+    assert str(pxml) == '<span id="Hello">\n    Hello\n</span>\n'
 
-        """
-        <span id="Hello">
-            Hello
+    """
+    <span id="Hello">
+        <span id="World">
+            HelloWorld
         </span>
-        """
-        pxml = PXML(4)
-        with pxml.tag("span", [("id", "Hello")]):
-            pxml.indent().insert("Hello").newline()
-        self.assertEqual(['<span id="Hello">', "\n", "    ", "Hello", "\n", "</span>", "\n"], pxml.raw)
-        self.assertEqual('<span id="Hello">\n    Hello\n</span>\n', str(pxml))
-
-        """
-        <span id="Hello">
-            <span id="World">
-                HelloWorld
-            </span>
-        </span>
-        """
-        pxml = PXML(4)
-        with pxml.tag("span", [("id", "Hello")]):
-            with pxml.tag("span", [("id", "World")]):
-                pxml.indent().insert("HelloWorld").newline()
-        self.assertEqual(['<span id="Hello">', "\n", "    ", '<span id="World">', "\n", "        ", "HelloWorld", "\n", "    ", "</span>", "\n", "</span>", "\n"], pxml.raw)
-        self.assertEqual('<span id="Hello">\n    <span id="World">\n        HelloWorld\n    </span>\n</span>\n', str(pxml))
-
-
-if __name__ == "__main__":
-    unittest.main()
+    </span>
+    """
+    pxml = PXML(4)
+    with pxml.tag("span", [("id", "Hello")]):
+        with pxml.tag("span", [("id", "World")]):
+            pxml.indent().insert("HelloWorld").newline()
+    assert pxml.raw == ['<span id="Hello">', "\n", "    ", '<span id="World">', "\n", "        ", "HelloWorld", "\n", "    ", "</span>", "\n", "</span>", "\n"]
+    assert str(pxml) == '<span id="Hello">\n    <span id="World">\n        HelloWorld\n    </span>\n</span>\n'
