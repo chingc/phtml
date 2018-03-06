@@ -1,7 +1,5 @@
 """Tests"""
 
-from itertools import permutations
-
 import pytest
 
 
@@ -15,59 +13,6 @@ def test_check_str(PXML, types):
     for element in [t for t in types if not isinstance(t, str)]:
         with pytest.raises(TypeError):
             PXML.check_str(element)
-
-
-def test_check_attr(PXML, types):
-    """test"""
-    # pass: empty list
-    assert PXML.check_attr([]) is None
-
-    # pass: list of 2-tuple (tuple elements are strings)
-    for element in permutations([t for t in types if isinstance(t, str)], 2):
-        assert PXML.check_attr([element]) is None
-
-    # fail: non-list
-    for element in [t for t in types if not isinstance(t, list)]:
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-    # fail: 1 element list (element is not a 2-tuple of strings)
-    for element in permutations(types, 1):
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-    # fail: 2 element list (elements are not a 2-tuple of strings)
-    for element in permutations(types, 2):
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-    # fail: 3 element list (elements are not a 2-tuple of strings)
-    for element in permutations(types, 3):
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-    # fail: list of 1-tuple
-    for element in permutations(types, 1):
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-    # fail: list of 2-tuple (tuple elements are non-strings)
-    for element in permutations([t for t in types if not isinstance(t, str)], 2):
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-    # fail: list of 3-tuple
-    for element in permutations(types, 3):
-        with pytest.raises(TypeError):
-            PXML.check_attr(element)
-
-
-def test_attributes(PXML):
-    """test"""
-    assert PXML.attributes([]) == ""
-    assert PXML.attributes([("hello", "world")]) == ' hello="world"'
-    assert PXML.attributes([("a", "1"), ("b", "2")]) == ' a="1" b="2"'
-    assert PXML.attributes([("a", "1"), ("b", "2"), ("c", "3")]) == ' a="1" b="2" c="3"'
 
 
 def test_etag(PXML):

@@ -2,6 +2,8 @@
 
 from contextlib import contextmanager
 
+from pxml.attr import Attr  # pylint: disable=E
+
 
 class PXML():
     """Main class."""
@@ -28,41 +30,6 @@ class PXML():
             raise TypeError("Expected {}, but got {}".format(type(""), type(obj)))
 
 
-    @staticmethod
-    def check_attr(obj):
-        """Check if an object is a list of 2-tuple strings.
-
-        obj -- The object to check.
-
-        Success => None
-        Failure => Raise TypeError
-        """
-        if not isinstance(obj, list):
-            raise TypeError("Expected {}, but got {}".format(type([]), type(obj)))
-        for element in obj:
-            if not isinstance(element, tuple):
-                raise TypeError("Expected {}, but got {}".format(type(()), type(element)))
-            if len(element) != 2:
-                raise TypeError("Expected tuple length to be 2, but got {}".format(len(element)))
-            if not (isinstance(element[0], str) and isinstance(element[1], str)):
-                raise TypeError("Expected all tuple elements to be {}".format(type("")))
-
-
-    @staticmethod
-    def attributes(attr):
-        """Stringify an attribute list.
-
-        attr -- A list of 2-tuple strings.
-
-        => The string representation of attr.
-        """
-        PXML.check_attr(attr)
-        to_string = ""
-        for name, value in attr:
-            to_string += ' {}="{}"'.format(name, value)
-        return to_string
-
-
     def etag(self, name, attr=None):
         """Add empty tag content.
 
@@ -71,9 +38,7 @@ class PXML():
 
         => self
         """
-        if attr is None:
-            attr = []
-        self.insert("<{}{} />".format(name, PXML.attributes(attr)))
+        self.insert(f"<{name} />" if attr is None else f"<{name} {Attr(*attr)} />")
         return self
 
 
@@ -115,7 +80,7 @@ class PXML():
 
 
     @contextmanager
-    def tag(self, name, attr=None):
+    def tag(self, name, attr=None, oneline=False):
         """Add tag content.
 
         name -- The name of the tag.
@@ -123,13 +88,13 @@ class PXML():
 
         => self
         """
-        if attr is None:
-            attr = []
-        self.indent().insert("<{}{}>".format(name, PXML.attributes(attr))).newline()
+        attributes = "" if attr is None else f" {Attr(*attr)}"
+        # self.indent().insert(f"<{name}>" if attr is None else f"<{name} {Attr(*attr)}>").newline()
+        self.indent().insert(f"<{name}{attributes}>").newline()
         self.depth += 1
         yield
         self.depth -= 1
-        self.indent().insert("</{}>".format(name)).newline()
+        self.indent().insert(f"</{name}>").newline()
         return self
 
 
@@ -142,9 +107,7 @@ class PXML():
 
         => self
         """
-        if attr is None:
-            attr = []
-        self.insert("<{}{}>".format(name, PXML.attributes(attr)))
+        self.insert(f"<{name}>" if attr is None else f"<{name} {Attr(*attr)}>")
         yield
-        self.insert("</{}>".format(name))
+        self.insert(f"</{name}>")
         return self
