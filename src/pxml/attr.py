@@ -3,10 +3,6 @@
 from .alias import Attributes, FormattedAttributes, Attribute, ValueAttribute  # pylint: disable=E
 
 
-BooleanAttribute = str
-ValueAttribute = Tuple[str, Union[int, str]]  # pylint: disable=C
-Attribute = Union[BooleanAttribute, ValueAttribute]  # pylint: disable=C
-
 class Attr():
     """Create HTML Attributes.
 
@@ -33,14 +29,14 @@ class Attr():
         return f'{_[0]}="{_[1]}"'
 
     def __init__(self, *attrs: Attribute) -> None:
-        self.attrs: List[str] = []
+        self.attrs: FormattedAttributes = []
         self.append(*attrs)
 
     def __eq__(self, other: object) -> bool:
         return str(self) == str(other)
 
     def __repr__(self) -> str:
-        output: List[Attribute] = []
+        output: Attributes = []
         for attr in self.attrs:
             if "=" in attr:
                 output.append(self._decode(attr))
