@@ -1,7 +1,7 @@
-"""Type Alias"""
+"""Type Hints"""
 # pylint: disable=C
 
-from typing import List, Tuple, Union
+from typing import Generator, List, Tuple, Union
 
 
 BooleanAttribute = str
@@ -10,3 +10,7 @@ Attribute = Union[BooleanAttribute, ValueAttribute]
 
 Attributes = List[Attribute]
 FormattedAttributes = List[str]
+
+FormattedElements = List[str]
+
+Wrapper = Generator

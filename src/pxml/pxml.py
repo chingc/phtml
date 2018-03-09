@@ -2,112 +2,88 @@
 
 from contextlib import contextmanager
 
-from pxml.attr import Attr  # pylint: disable=E
+from .attr import Attr  # pylint: disable=E
+from .error import NonVoidError, VoidError  # pylint: disable=E
+from .typehint import FormattedElements, Wrapper  # pylint: disable=E
 
 
 class PXML():
-    """Main class."""
-    def __init__(self, spaces=4):
-        self.spaces = spaces
-        self.depth = 0
-        self.raw = []
-
-
-    def __str__(self):
-        return "".join(self.raw)
-
+    """Create HTML Elements.
+    """
+    @staticmethod
+    def _open_tag(name: str, attr: Attr = None) -> str:
+        return f"<{name}{'' if attr is None else f' {Attr(*attr)}'}>"
 
     @staticmethod
-    def check_str(obj):
-        """Check if an object is a string.
+    def _close_tag(name: str) -> str:
+        return f"</{name}>"
 
-        obj -- The object to check.
+    @staticmethod
+    def _is_void(name: str) -> bool:
+        # http://w3c.github.io/html/syntax.html#void-elements
+        return name in ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]  # pylint: disable=C
 
-        Success => None
-        Failure => Raise TypeError
-        """
-        if not isinstance(obj, str):
-            raise TypeError("Expected {}, but got {}".format(type(""), type(obj)))
+    def __init__(self, spaces: int = 4) -> None:
+        self.depth: int = 0
+        self.elems: FormattedElements = []
+        self.oneline: bool = False
+        self.spaces: int = spaces
 
+    def __eq__(self, other: object) -> bool:
+        return str(self) == str(other)
 
-    def etag(self, name, attr=None):
-        """Add empty tag content.
+    def __repr__(self) -> str:
+        # TODO: REPR
+        pass
 
-        name -- The name of the tag.
-        attr -- A list of 2-tuple strings.  Default: None
+    def __str__(self) -> str:
+        return "".join(self.elems)
 
-        => self
-        """
-        self.insert(f"<{name} />" if attr is None else f"<{name} {Attr(*attr)} />")
-        return self
-
-
-    def indent(self, repeat=1):
-        """Add indentation.
-
-        repeat -- The number of times to indent.  Default: 1
-
-        => self
-        """
-        for _ in range(repeat):
-            self.insert(" " * self.spaces * self.depth)
-        return self
-
-
-    def insert(self, string):
-        """Add a string.
-
-        string -- The string to add.
-
-        => self
-        """
-        self.check_str(string)
+    def write(self, string: str) -> "PXML":
+        """doc"""  # TODO: Doc
         if string:
-            self.raw.append(string)
+            if not self.oneline:
+                self.indent()
+            self.elems.append(string)
+            if not self.oneline:
+                self.newline()
         return self
 
-
-    def newline(self, repeat=1):
-        """Add a newline.
-
-        repeat -- The number of newlines to add.  Default: 1
-
-        => self
-        """
-        for _ in range(repeat):
-            self.insert("\n")
+    def newline(self) -> "PXML":
+        """Add a newline."""
+        self.elems.append("\n")
         return self
 
+    def indent(self) -> "PXML":
+        """Add indentation."""
+        self.elems.append(" " * self.spaces * self.depth)
+        return self
+
+    def vwrap(self, name: str, attr: Attr = None) -> "PXML":
+        """Add a void element."""
+        if not self._is_void(name):
+            raise NonVoidError(name)
+        self.write(self._open_tag(name, attr))
+        return self
 
     @contextmanager
-    def tag(self, name, attr=None, oneline=False):
-        """Add tag content.
+    def owrap(self, name: str, attr: Attr = None) -> Wrapper:
+        """Add an HTML element (oneliner)."""
+        if self._is_void(name):
+            raise VoidError(name)
+        self.oneline = True
+        self.write(self._open_tag(name, attr))
+        yield
+        self.write(self._close_tag(name))
 
-        name -- The name of the tag.
-        attr -- A list of 2-tuple strings.  Default: None
-
-        => self
-        """
-        attributes = "" if attr is None else f" {Attr(*attr)}"
-        # self.indent().insert(f"<{name}>" if attr is None else f"<{name} {Attr(*attr)}>").newline()
-        self.indent().insert(f"<{name}{attributes}>").newline()
+    @contextmanager
+    def wrap(self, name: str, attr: Attr = None) -> Wrapper:
+        """Add an HTML element."""
+        if self._is_void(name):
+            raise VoidError(name)
+        self.oneline = False
+        self.write(self._open_tag(name, attr))
         self.depth += 1
         yield
         self.depth -= 1
-        self.indent().insert(f"</{name}>").newline()
-        return self
-
-
-    @contextmanager
-    def itag(self, name, attr=None):
-        """Add inline tag content.
-
-        name -- The name of the tag.
-        attr -- A list of 2-tuple strings.  Default: None
-
-        => self
-        """
-        self.insert(f"<{name}>" if attr is None else f"<{name} {Attr(*attr)}>")
-        yield
-        self.insert(f"</{name}>")
-        return self
+        self.write(self._close_tag(name))

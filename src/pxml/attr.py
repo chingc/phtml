@@ -1,6 +1,6 @@
 """Attribute"""
 
-from .alias import Attributes, FormattedAttributes, Attribute, ValueAttribute  # pylint: disable=E
+from .typehint import Attributes, FormattedAttributes, Attribute, ValueAttribute  # pylint: disable=E
 
 
 class Attr():
