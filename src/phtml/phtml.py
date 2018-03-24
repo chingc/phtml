@@ -1,4 +1,4 @@
-"""Programmatic XML: Write XML Programmatically"""
+"""Programmatic HTML"""
 
 from contextlib import contextmanager
 from typing import Generator, List, Tuple, Union
@@ -9,7 +9,7 @@ ValueAttribute = Tuple[str, Union[int, str]]  # pylint: disable=C
 Attribute = Union[BooleanAttribute, ValueAttribute]  # pylint: disable=C
 
 
-class PXML():
+class PHTML():
     """Create HTML Elements.
     """
     @staticmethod
@@ -68,7 +68,7 @@ class PXML():
     def __str__(self) -> str:
         return "".join(self.elems)
 
-    def append(self, string: str) -> "PXML":
+    def append(self, string: str) -> "PHTML":
         """Add a string."""
         if isinstance(string, str):
             if not self.oneline:
@@ -80,17 +80,17 @@ class PXML():
             raise ValueError("Value being appended must be a string type")
         return self
 
-    def indent(self) -> "PXML":
+    def indent(self) -> "PHTML":
         """Add indentation."""
         self.elems.append(" " * self.spaces * self.depth)
         return self
 
-    def newline(self) -> "PXML":
+    def newline(self) -> "PHTML":
         """Add a newline."""
         self.elems.append("\n")
         return self
 
-    def vwrap(self, elem: str, attrs: str = "") -> "PXML":
+    def vwrap(self, elem: str, attrs: str = "") -> "PHTML":
         """Add a void element."""
         if not self._is_void(elem):
             raise ValueError(f"Use the wrap or owrap method for non-void elements like {elem}")
