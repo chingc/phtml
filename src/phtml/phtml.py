@@ -4,14 +4,10 @@ from contextlib import contextmanager
 from typing import Generator, List, Tuple, Union
 
 
-BooleanAttribute = str
-ValueAttribute = Tuple[str, Union[int, str]]  # pylint: disable=C
-Attribute = Union[BooleanAttribute, ValueAttribute]  # pylint: disable=C
-
-
 class PHTML():
-    """Create HTML Elements.
-    """
+    """Create HTML Elements."""
+    Attribute = Union[str, Tuple[str, Union[int, str]]]
+
     @staticmethod
     def _close_tag(elem: str) -> str:
         return f"</{elem}>"
@@ -19,7 +15,7 @@ class PHTML():
     @staticmethod
     def _is_void(elem: str) -> bool:
         # http://w3c.github.io/html/syntax.html#void-elements
-        return elem in ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]  # pylint: disable=C
+        return elem in ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]  # pylint: disable=C0301
 
     @staticmethod
     def _open_tag(elem: str, attrs: str = "") -> str:
@@ -48,10 +44,10 @@ class PHTML():
         return " ".join(formatted)
 
     def __init__(self, spaces: int = 4) -> None:
-        self.depth: int = 0
+        self.depth = 0
         self.elems: List[str] = []
-        self.oneline: bool = False
-        self.spaces: int = spaces
+        self.oneline = False
+        self.spaces = spaces
 
     def __contains__(self, item: object) -> bool:
         return str(item) in str(self)
