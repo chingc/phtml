@@ -43,10 +43,10 @@ class PHTML():
                 raise ValueError(f"Bad attribute: {attr_}")
         return " ".join(formatted)
 
-    def __init__(self, spaces: int = 4) -> None:
+    def __init__(self, auto_spacing: bool = True, spaces: int = 4) -> None:
+        self.auto_spacing = auto_spacing
         self.depth = 0
         self.elems: List[str] = []
-        self.oneline = False
         self.spaces = spaces
 
     def __contains__(self, item: object) -> bool:
@@ -67,10 +67,10 @@ class PHTML():
     def append(self, string: str) -> "PHTML":
         """Add a string."""
         if isinstance(string, str):
-            if not self.oneline:
+            if self.auto_spacing:
                 self.indent()
             self.elems.append(string)
-            if not self.oneline:
+            if self.auto_spacing:
                 self.newline()
         else:
             raise ValueError("Value being appended must be a string type")
@@ -89,38 +89,17 @@ class PHTML():
     def vwrap(self, elem: str, attrs: str = "") -> "PHTML":
         """Add a void element."""
         if not self._is_void(elem):
-            raise ValueError(f"Use the wrap or owrap method for non-void elements like {elem}")
+            raise ValueError(f"Use the wrap context manager for non-void elements like {elem}")
         self.append(self._open_tag(elem, attrs))
         return self
-
-    @contextmanager
-    def owrap(self, elem: str, attrs: str = "", newline: bool = False) -> Generator:
-        """Add an element (oneliner)."""
-        if self._is_void(elem):
-            raise ValueError(f"Use the vwrap method for void elements like {elem}")
-        if not self.oneline:
-            self.oneline = True
-            self.indent()
-        self.append(self._open_tag(elem, attrs))
-        yield
-        self.append(self._close_tag(elem))
-        if newline:
-            self.newline()
-            self.oneline = False
 
     @contextmanager
     def wrap(self, elem: str, attrs: str = "") -> Generator:
         """Add an element."""
         if self._is_void(elem):
             raise ValueError(f"Use the vwrap method for void elements like {elem}")
-        if self.oneline:
-            self.oneline = False
-            self.newline()
         self.append(self._open_tag(elem, attrs))
         self.depth += 1
         yield
-        if self.oneline:
-            self.oneline = False
-            self.newline()
         self.depth -= 1
         self.append(self._close_tag(elem))

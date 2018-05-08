@@ -4,12 +4,20 @@ import pytest
 
 
 class TestDunder():
-    def test_dunder(self, phtml):
-        assert not phtml
-        phtml.append("a")
-        assert "a" in phtml
-        assert len(phtml) == 2  # + 1 due to newline
-        assert str(phtml) == repr(phtml) == phtml == "a\n"
+    def test_contains(self, poff):
+        assert "a" not in poff
+        poff.append("a")
+        assert "a" in poff
+
+    def test_eq_repr_str(self, poff):
+        assert repr(poff) == str(poff) == poff == ""
+        poff.append("a")
+        assert repr(poff) == str(poff) == poff == "a"
+
+    def test_len(self, poff):
+        assert not poff
+        poff.append("a")
+        assert len(poff) == 1
 
 
 class TestAttribute():
@@ -32,162 +40,183 @@ class TestAttribute():
 
 class TestAppend():
     @pytest.mark.parametrize("repeat", range(4))
-    def test_with_newline(self, phtml, repeat):
+    def test_with_newline(self, pon, repeat):
         for _ in range(repeat):
-            phtml.append("a")
-        assert phtml == "a\n" * repeat
+            pon.append("a")
+        assert pon == "a\n" * repeat
 
     @pytest.mark.parametrize("repeat", range(4))
-    def test_without_newline(self, phtml, repeat):
-        phtml.oneline = True
+    def test_without_newline(self, poff, repeat):
         for _ in range(repeat):
-            phtml.append("a")
-        assert phtml == "a" * repeat
+            poff.append("a")
+        assert poff == "a" * repeat
 
     @pytest.mark.parametrize("bad", [None, True, 1])
-    def test_non_string_type(self, phtml, bad):
+    def test_non_string_type(self, poff, bad):
         with pytest.raises(ValueError):
-            phtml.append(bad)
+            poff.append(bad)
 
 
 class TestIndent():
     @pytest.mark.parametrize("spaces", range(4))
     @pytest.mark.parametrize("depth", range(4))
-    def test_depth(self, phtml, spaces, depth):
-        phtml.spaces = spaces
-        phtml.depth = depth
-        assert phtml.indent() == " " * phtml.spaces * phtml.depth
+    def test_depth(self, poff, spaces, depth):
+        poff.depth = depth
+        poff.spaces = spaces
+        assert poff.indent() == " " * poff.spaces * poff.depth
 
 
 class TestNewline():
     @pytest.mark.parametrize("depth", range(2))
-    def test_depth_does_not_indent(self, phtml, depth):
-        phtml.depth = depth
-        phtml.newline().newline()
-        assert phtml == "\n\n"
-        phtml.newline().newline()
-        assert " " not in phtml
+    def test_depth_does_not_indent(self, poff, depth):
+        poff.depth = depth
+        poff.newline().newline()
+        assert poff == "\n\n"
+        poff.newline().newline()
+        assert " " not in poff
 
 
-class TestVoidElement():
-    def test_without_attribute(self, phtml):
-        phtml.vwrap("br")
-        assert phtml == "<br>\n"
+class TestVoidWrap():
+    def test_without_attribute(self, poff):
+        poff.vwrap("br")
+        assert poff == "<br>"
 
-    def test_with_attribute(self, attr, phtml):
-        phtml.vwrap("img", attr("abc", ("x", 1), ("y", 2), ("z", 3)))
-        assert phtml == '<img abc x="1" y="2" z="3">\n'
+    def test_with_attribute(self, attr, poff):
+        poff.vwrap("img", attr("abc", ("x", 1), ("y", 2), ("z", 3)))
+        assert poff == '<img abc x="1" y="2" z="3">'
 
     @pytest.mark.parametrize("bad", ["a", "b", "c"])
-    def test_non_void_element(self, phtml, bad):
+    def test_non_void_element(self, poff, bad):
         with pytest.raises(ValueError):
-            phtml.vwrap(bad)
+            poff.vwrap(bad)
 
 
-class TestOneline():
-    def test_single(self, phtml):
-        with phtml.owrap("a"):
-            phtml.append("1")
-        assert phtml == "<a>1</a>"
+class TestWrapAutoSpacingOff():
+    def test_single(self, poff):
+        with poff.wrap("a"):
+            poff.append("1")
+        assert poff == "<a>1</a>"
 
-    def test_nested(self, phtml):
-        with phtml.owrap("a"), phtml.owrap("b"):
-            phtml.append("1 2")
-        assert phtml == "<a><b>1 2</b></a>"
+    def test_nested(self, poff):
+        with poff.wrap("a"), poff.wrap("b"):
+            poff.append("1 2")
+        assert poff == "<a><b>1 2</b></a>"
 
-    def test_double_nested(self, phtml):
-        with phtml.owrap("a"), phtml.owrap("b"), phtml.owrap("c"):
-            phtml.append("1 2 3")
-        assert phtml == "<a><b><c>1 2 3</c></b></a>"
+    def test_double_nested(self, poff):
+        with poff.wrap("a"), poff.wrap("b"), poff.wrap("c"):
+            poff.append("1 2 3")
+        assert poff == "<a><b><c>1 2 3</c></b></a>"
 
-    def test_sibling(self, phtml):
-        with phtml.owrap("a"):
-            phtml.append("1")
-        with phtml.owrap("b"):
-            phtml.append("2")
-        assert phtml == "<a>1</a><b>2</b>"
+    def test_sibling(self, poff):
+        with poff.wrap("a"):
+            poff.append("1")
+        with poff.wrap("b"):
+            poff.append("2")
+        assert poff == "<a>1</a><b>2</b>"
 
-    def test_nested_sibling(self, phtml):
-        with phtml.owrap("a"):
-            with phtml.owrap("b"):
-                phtml.append("2")
-            with phtml.owrap("c"):
-                phtml.append("3")
-        assert phtml == "<a><b>2</b><c>3</c></a>"
+    def test_nested_sibling(self, poff):
+        with poff.wrap("a"):
+            with poff.wrap("b"):
+                poff.append("2")
+            with poff.wrap("c"):
+                poff.append("3")
+        assert poff == "<a><b>2</b><c>3</c></a>"
 
 
-class TestWrap():
-    def test_single(self, phtml, expect_file):
-        with phtml.wrap("a"):
-            phtml.append("1")
-        assert phtml == expect_file("expected_single.txt")
+class TestWrapAutoSpacingOn():
+    def test_single(self, pon, expect_file):
+        with pon.wrap("a"):
+            pon.append("1")
+        assert pon == expect_file("expected_single.txt")
 
-    def test_nested(self, phtml, expect_file):
-        with phtml.wrap("a"), phtml.wrap("b"):
-            phtml.append("1 2")
-        assert phtml == expect_file("expected_nested.txt")
+    def test_nested(self, pon, expect_file):
+        with pon.wrap("a"), pon.wrap("b"):
+            pon.append("1 2")
+        assert pon == expect_file("expected_nested.txt")
 
-    def test_double_nested(self, phtml, expect_file):
-        with phtml.wrap("a"), phtml.wrap("b"), phtml.wrap("c"):
-            phtml.append("1 2 3")
-        assert phtml == expect_file("expected_double_nested.txt")
+    def test_double_nested(self, pon, expect_file):
+        with pon.wrap("a"), pon.wrap("b"), pon.wrap("c"):
+            pon.append("1 2 3")
+        assert pon == expect_file("expected_double_nested.txt")
 
-    def test_sibling(self, phtml, expect_file):
-        with phtml.wrap("a"):
-            phtml.append("1")
-        with phtml.wrap("b"):
-            phtml.append("2")
-        assert phtml == expect_file("expected_sibling.txt")
+    def test_sibling(self, pon, expect_file):
+        with pon.wrap("a"):
+            pon.append("1")
+        with pon.wrap("b"):
+            pon.append("2")
+        assert pon == expect_file("expected_sibling.txt")
 
-    def test_nested_sibling(self, phtml, expect_file):
-        with phtml.wrap("a"):
-            with phtml.wrap("b"):
-                phtml.append("2")
-            with phtml.wrap("c"):
-                phtml.append("3")
-        assert phtml == expect_file("expected_nested_sibling.txt")
+    def test_nested_sibling(self, pon, expect_file):
+        with pon.wrap("a"):
+            with pon.wrap("b"):
+                pon.append("2")
+            with pon.wrap("c"):
+                pon.append("3")
+        assert pon == expect_file("expected_nested_sibling.txt")
 
-    def test_nested_oneline(self, phtml, expect_file):
-        with phtml.wrap("a"):
-            with phtml.owrap("b"):
-                phtml.append("2")
-        assert phtml == expect_file("expected_nested_oneline.txt")
 
-    def test_nested_oneline_sibling(self, phtml, expect_file):
-        with phtml.wrap("a"):
-            with phtml.owrap("b", newline=True):
-                phtml.append("2")
-            with phtml.owrap("c"):
-                phtml.append("3")
-        assert phtml == expect_file("expected_nested_oneline_sibling.txt")
+class TestWrapAutoSpacingMixed():
+    def test_nested_oneline(self, pon, expect_file):
+        with pon.wrap("a"):
+            pon.auto_spacing = False
+            pon.indent()
+            with pon.wrap("b"):
+                pon.append("2")
+            pon.auto_spacing = True
+            pon.newline()
+        assert pon == expect_file("expected_nested_oneline.txt")
 
-    def test_complex(self, phtml, expect_file):
-        with phtml.wrap("a"):
-            phtml.append("1")
-            phtml.newline()
-            with phtml.wrap("b"):
-                phtml.append("2")
-            phtml.newline()
-            with phtml.owrap("c", newline=True):
-                phtml.append("3")
-            with phtml.owrap("d"):
-                phtml.append("4")
-            phtml.newline()
-            with phtml.wrap("e"):
-                phtml.append("5")
-                phtml.newline()
-            with phtml.owrap("f"):
-                phtml.append("6")
-            phtml.newline()
-            with phtml.wrap("g"):
-                with phtml.wrap("h"):
-                    phtml.append("8")
-                    with phtml.owrap("i"):
-                        phtml.append("9")
-                    with phtml.owrap("j", newline=True):
-                        phtml.append("10")
-                    phtml.newline()
-                    with phtml.owrap("k", newline=True), phtml.owrap("l"):
-                        phtml.append("11 12")
-                phtml.append("7")
-        assert phtml == expect_file("expected_complex.txt")
+    def test_nested_oneline_sibling(self, pon, expect_file):
+        with pon.wrap("a"):
+            pon.auto_spacing = False
+            pon.indent()
+            with pon.wrap("b"):
+                pon.append("2")
+            pon.newline().indent()
+            with pon.wrap("c"):
+                pon.append("3")
+            pon.newline()
+            pon.auto_spacing = True
+        assert pon == expect_file("expected_nested_oneline_sibling.txt")
+
+    def test_complex(self, pon, expect_file):
+        with pon.wrap("a"):
+            pon.append("1")
+            pon.newline()
+            with pon.wrap("b"):
+                pon.append("2")
+            pon.newline()
+            pon.auto_spacing = False
+            pon.indent()
+            with pon.wrap("c"):
+                pon.append("3")
+            pon.newline().indent()
+            with pon.wrap("d"):
+                pon.append("4")
+            pon.newline().newline()
+            pon.auto_spacing = True
+            with pon.wrap("e"):
+                pon.append("5")
+                pon.newline()
+            pon.auto_spacing = False
+            pon.indent()
+            with pon.wrap("f"):
+                pon.append("6")
+            pon.newline().newline()
+            pon.auto_spacing = True
+            with pon.wrap("g"):
+                with pon.wrap("h"):
+                    pon.append("8")
+                    pon.auto_spacing = False
+                    pon.indent()
+                    with pon.wrap("i"):
+                        pon.append("9")
+                    with pon.wrap("j"):
+                        pon.append("10")
+                    pon.newline().newline().indent()
+                    with pon.wrap("k"), pon.wrap("l"):
+                        pon.append("11 12")
+                    pon.newline()
+                    pon.auto_spacing = True
+                pon.append("7")
+        assert pon == expect_file("expected_complex.txt")

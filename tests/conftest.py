@@ -20,6 +20,11 @@ def expect_file():
     return _read
 
 @pytest.fixture
-def phtml():
-    """New instance of PHTML."""
-    return PHTML()
+def pon():
+    """New instance of PHTML with auto spacing enabled."""
+    return PHTML(auto_spacing=True)
+
+@pytest.fixture
+def poff():
+    """New instance of PHTML with auto spacing disabled."""
+    return PHTML(auto_spacing=False)
