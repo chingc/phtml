@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/chingc/pxml.svg?branch=master)](https://travis-ci.org/chingc/pxml) [![Coverage Status](https://coveralls.io/repos/chingc/pxml/badge.svg?branch=master&service=github)](https://coveralls.io/github/chingc/pxml?branch=master) [![Code Climate](https://codeclimate.com/github/chingc/pxml/badges/gpa.svg)](https://codeclimate.com/github/chingc/pxml)
+[![CircleCI](https://circleci.com/gh/chingc/phtml.svg?style=shield)](https://circleci.com/gh/chingc/phtml) [![codecov](https://codecov.io/gh/chingc/phtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/phtml)
 
 # pxml
 
@@ -14,7 +14,7 @@ Simply import the module into your Python project.  There are no dependencies.
 >>> pxml = PXML()
 >>> with pxml.itag("greeting"):
 ...     pxml.insert("Hello, World!")
-...     
+...
 >>> print(pxml)
 <greeting>Hello, World!</greeting>
 ```

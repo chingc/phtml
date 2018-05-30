@@ -48,8 +48,14 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest
+            coverage run -m pytest
 
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+      - run:
+          name: submit code coverage
+          command: |
+            . venv/bin/activate
+            codecov
