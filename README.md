@@ -1,130 +1,129 @@
-[![CircleCI](https://circleci.com/gh/chingc/phtml.svg?style=shield)](https://circleci.com/gh/chingc/phtml) [![codecov](https://codecov.io/gh/chingc/phtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/phtml)
+# pyhtml [![CircleCI](https://circleci.com/gh/chingc/pyhtml.svg?style=shield)](https://circleci.com/gh/chingc/pyhtml) [![codecov](https://codecov.io/gh/chingc/pyhtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/pyhtml)
 
-# pxml
+For those who love Python and, for reasons unknown, still like to write and format HTML by hand.
 
-Programmatic XML is a simple tool that helps you generate XML programmatically.
+## Installation
 
-
-## Usage
-
-Simply import the module into your Python project.  There are no dependencies.
-
-``` python
->>> from pxml import PXML
->>> pxml = PXML()
->>> with pxml.itag("greeting"):
-...     pxml.insert("Hello, World!")
-...
->>> print(pxml)
-<greeting>Hello, World!</greeting>
-```
-
+- Add `pyhtml.py` to your project
+- `from pyhtml import PyHTML`
 
 ## Reference
 
+### Constructor
 
-#### Constructor
+`PyHTML(auto_spacing: bool = True, spaces: int = 4)`
 
-`PXML(width)` -- Create a pxml object.
-- width: (Optional) The number of spaces used for indentation.  Default: 4
+- `auto_spacing: bool` - Automatic indentation and newline.  Default: `True`
 
+- `spaces: int` - The number of spaces used for indentation.  Default: `4`
 
-#### Methods
+Both of these arguments are instance variables that can be changed at any time.  Although changing the number of spaces used for indentation isn't very useful, disabling auto-spacing has its uses and will be covered below.
 
-`attributes(attr)` -- Return the attribute list as a string.
-- attr: A list of 2-tuple strings.
+### Methods
+
+`attr(*attr: Union[str, Tuple[str, Union[int, str]]]) -> str`
+
+A static method that will return a string formatted as HTML attributes.  It can take multiple strings and 2-tuples.  Strings are treated as boolean attributes and 2-tuples are treated as value attributes.  Tuples take the form (str, str) or (str, int).
 
 ``` python
->>> pxml.attributes([("id", "skinner"), ("class", "principal")])
-' id="skinner" class="principal"'
+>>> PyHTML.attr(("src", "simpsons.webm"), "autoplay", ("width", 800), ("height", 600))
+'src="simpsons.webm" autoplay width="800" height="600"'
 ```
 
-`etag(name, attr)` -- Add empty tag content.
-- name: Name of the tag.
-- attr: (Optional) A list of 2-tuple strings.
+`append(string: str) -> self`
+
+Add text.
+
+`indent() -> self`
+
+Add indentation.  There is no need to call this if auto-spacing is enabled.
+
+`newline() -> self`
+
+Add a newline.  There is no need to call this if auto-spacing is enabled.
+
+`vwrap(elem: str, attrs: str = "") -> self`
+
+For void elements that do not have a close tag.
 
 ``` python
->>> pxml.etag("img", [("src", "/channel_6/homer_file_photo.png"), ("width", "640"), ("height", "480")])
->>> print(pxml)
-<img src="/channel_6/homer_file_photo.png" width="640" height="480" />
+>>> html.vwrap("img", PyHTML.attr(("src", "kwikemart.png"), ("width", 358), ("height", 278)))
+>>> print(html)
+<img src="kwikemart.png" width="358" height="278">
 ```
 
-`indent(repeat)` -- Add indentation.
-- repeat: (Optional) The number of times to indent.  Default: 1
+`wrap(elem: str, attrs: str = "") -> Generator`
+
+A context manager for adding an element.
 
 ``` python
->>> print(pxml.indent().insert("Bart!"))  # assuming the current indentation depth is 1
-    Bart!
-```
-
-`insert(string)` -- Add a string.
-
-``` python
->>> print(pxml.insert("Lisa"))
-Lisa
-```
-
-`newline(repeat)` -- Add a newline.
-- repeat: (Optional) The number of newlines to add.  Default: 1
-
-``` python
->>> print(pxml.insert('10 print "D\'oh!"').newline().insert("20 GOTO 10"))
-10 print "D'oh!"
-20 GOTO 10
-```
-
-
-#### Context Managers
-
-`tag(name, attr)` -- Add tag content.
-- name: Name of the tag.
-- attr: (Optional) A list of 2-tuple strings.
-
-``` python
->>> with pxml.tag("div", [("class", "big")]):
-...     pxml.indent().insert("Embiggened!").newline()
+>>> with html.wrap("div", PyHTML.attr(("class", "big"))):
+...     html.append("Embiggened!")
 ...
->>> print(pxml)
+>>> print(html)
 <div class="big">
     Embiggened!
 </div>
 ```
 
-`itag(name, attr)` -- Add inline tag content.
-- name: Name of the tag.
-- attr: (Optional) A list of 2-tuple strings.
+## Examples
 
 ``` python
->>> with pxml.itag("beer"):
-...     pxml.insert("Duff!")
+>>> from pyhtml import PyHTML
+>>> html = PyHTML()
+>>> with html.wrap("html"):
+...     with html.wrap("head"):
+...         with html.wrap("title"):
+...             html.append("Dr. Nick")
+...     with html.wrap("body"):
+...         with html.wrap("p"):
+...             html.append("Hi, everybody!")
 ...
->>> print(pxml)
-<beer>Duff!</beer>
+>>> print(html)
+<html>
+    <head>
+        <title>
+            Dr. Nick
+        </title>
+    </head>
+    <body>
+        <p>
+            Hi, everybody!
+        </p>
+    </body>
+</html>
 ```
 
+``` python
+# Setting `auto_spacing` to `False` will disable auto-spacing.
+# This is useful if you want to have a wrapped element on a
+# single line.  Set it to `True` to re-enable auto-spacing.
 
-#### Instance Variables
-
-`spaces` -- The number of spaces used for indentation.
-
-`depth` -- The current indentation depth.
-
-`raw` -- The array of elements that will be outputted.
-
-
-## Example
+>>> from pyhtml import PyHTML
+>>> html = PyHTML()
+>>> html.auto_spacing = False
+>>> html.append("Bart! BART! ")
+>>> with html.wrap("b"):
+...     html.append("BAAAART!")
+...
+>>> print(html)
+Bart! BART! <b>BAAAART!</b>
+```
 
 ``` python
->>> pxml = PXML()
+>>> from pyhtml import PyHTML
+>>> html = PyHTML()
 >>> family = ["homer", "marge", "bart", "lisa", "maggie"]
->>> with pxml.tag("ul"):
+>>> with html.wrap("ul"):
+...     html.auto_spacing = False
 ...     for member in family:
-...         pxml.indent()
-...         with pxml.itag("li"):
-...             pxml.insert(member)
-...         pxml.newline()
+...         html.indent()
+...         with html.wrap("li"):
+...             html.append(member)
+...         html.newline()
+...     html.auto_spacing = True
 ...
->>> print(pxml)
+>>> print(html)
 <ul>
     <li>homer</li>
     <li>marge</li>
@@ -133,8 +132,3 @@ Lisa
     <li>maggie</li>
 </ul>
 ```
-
-
-## License
-
-Simplified BSD license.

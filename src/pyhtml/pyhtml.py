@@ -23,16 +23,7 @@ class PyHTML():
 
     @staticmethod
     def attr(*attrs: Attribute) -> str:
-        """Return a string formatted as HTML attributes.
-
-        Can take multiple strings and 2-tuples.  Strings are treated as boolean attributes and
-        2-tuples are treated as value attributes.  Tuples take the form (str, str) or (str, int).
-
-        For example, to create the attributes in the element:
-        <video src="videofile.webm" autoplay width="800" height="600"></video>
-
-        `attr(("src", "videofile.webm"), autoplay, ("width", 800), ("height", 600))`
-        """
+        """Return a string formatted as HTML attributes."""
         formatted = []
         for attr_ in attrs:
             if isinstance(attr_, str):
