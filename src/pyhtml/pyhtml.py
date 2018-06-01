@@ -1,10 +1,10 @@
-"""Programmatic HTML"""
+"""PyHTML"""
 
 from contextlib import contextmanager
 from typing import Generator, List, Tuple, Union
 
 
-class PHTML():
+class PyHTML():
     """Create HTML Elements."""
     Attribute = Union[str, Tuple[str, Union[int, str]]]
 
@@ -15,7 +15,7 @@ class PHTML():
     @staticmethod
     def _is_void(elem: str) -> bool:
         # http://w3c.github.io/html/syntax.html#void-elements
-        return elem in ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]  # pylint: disable=C0301
+        return elem in ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
 
     @staticmethod
     def _open_tag(elem: str, attrs: str = "") -> str:
@@ -64,7 +64,7 @@ class PHTML():
     def __str__(self) -> str:
         return "".join(self.elems)
 
-    def append(self, string: str) -> "PHTML":
+    def append(self, string: str) -> "PyHTML":
         """Add a string."""
         if isinstance(string, str):
             if self.auto_spacing:
@@ -76,17 +76,17 @@ class PHTML():
             raise ValueError("Value being appended must be a string type")
         return self
 
-    def indent(self) -> "PHTML":
+    def indent(self) -> "PyHTML":
         """Add indentation."""
         self.elems.append(" " * self.spaces * self.depth)
         return self
 
-    def newline(self) -> "PHTML":
+    def newline(self) -> "PyHTML":
         """Add a newline."""
         self.elems.append("\n")
         return self
 
-    def vwrap(self, elem: str, attrs: str = "") -> "PHTML":
+    def vwrap(self, elem: str, attrs: str = "") -> "PyHTML":
         """Add a void element."""
         if not self._is_void(elem):
             raise ValueError(f"Use the wrap context manager for non-void elements like {elem}")
