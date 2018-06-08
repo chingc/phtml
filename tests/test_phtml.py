@@ -88,6 +88,10 @@ class TestVoidWrap():
         with pytest.raises(ValueError):
             poff.vwrap(bad)
 
+    def test_wrap_void_element(self, poff):
+        with pytest.raises(ValueError):
+            with poff.wrap("br"): pass
+
 
 class TestWrapAutoSpacingOff():
     def test_single(self, poff):
