@@ -30,9 +30,9 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
+            pip install pipenv
+            pipenv install -d
+            pipenv --venv
 
       - save_cache:
           paths:
@@ -47,7 +47,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
+            pipenv shell
             coverage run -m pytest
 
       - store_artifacts:
@@ -57,5 +57,5 @@ jobs:
       - run:
           name: submit code coverage
           command: |
-            . venv/bin/activate
+            pipenv shell
             codecov
