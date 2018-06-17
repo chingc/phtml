@@ -1,16 +1,16 @@
-"""Test fixtures."""
+"""Fixtures"""
 
 from pathlib import Path
 
 import pytest
 
-from pyhtml import PyHTML
+import pyhtml
 
 
 @pytest.fixture
 def attr():
     """The static method attr."""
-    return PyHTML.attr
+    return pyhtml.attr
 
 @pytest.fixture
 def expect_file():
@@ -23,9 +23,9 @@ def expect_file():
 @pytest.fixture
 def pon():
     """New instance of PyHTML with auto spacing enabled."""
-    return PyHTML(auto_spacing=True)
+    return pyhtml.new(auto_spacing=True)
 
 @pytest.fixture
 def poff():
     """New instance of PyHTML with auto spacing disabled."""
-    return PyHTML(auto_spacing=False)
+    return pyhtml.new(auto_spacing=False)

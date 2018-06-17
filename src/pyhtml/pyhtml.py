@@ -6,14 +6,24 @@ from contextlib import contextmanager
 class PyHTML():
     """Write and format HTML manually."""
 
+    # https://www.w3.org/QA/2002/04/valid-dtd-list.html
+    _DOCTYPES = {
+        "html5": "<!DOCTYPE html>",
+        "html4.01s": '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
+        "html4.01t": '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">',
+        "html4.01f": '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">',
+        "xhtml1.1": '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+        "xhtml1.0s": '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+        "xhtml1.0t": '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+        "xhtml1.0f": '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">'
+    }
+
+    # http://w3c.github.io/html/syntax.html#void-elements
+    _VOID_ELEMENTS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
+
     @staticmethod
     def _close_tag(elem):
         return f"</{elem}>"
-
-    @staticmethod
-    def _is_void(elem):
-        # http://w3c.github.io/html/syntax.html#void-elements
-        return elem in ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
 
     @staticmethod
     def _open_tag(elem, attrs=""):
@@ -36,16 +46,22 @@ class PyHTML():
                 raise ValueError(f"Bad attribute: {attr_}")
         return " ".join(formatted)
 
-    def __init__(self, auto_spacing=True, spaces=4):
-        """Constructor.
+    def __init__(self, auto_spacing=True, spaces=4, doctype=""):
+        """Create a new instance of PyHTML.
 
         auto_spacing: bool -- automatic indentation and newlines (default: True)
         spaces: int -- number of spaces used for indentation (default: 4)
+        doctype: str -- doctype declaration (default: "")
         """
         self.auto_spacing = auto_spacing
         self.depth = 0
         self.elems = []
         self.spaces = spaces
+        if doctype:
+            if doctype in PyHTML._DOCTYPES:
+                self.elems.append(PyHTML._DOCTYPES[doctype])
+            else:
+                raise ValueError(f"Unknown doctype declaration: '{doctype}'")
 
     def __contains__(self, item):
         return str(item) in str(self)
@@ -75,7 +91,7 @@ class PyHTML():
             if self.auto_spacing:
                 self.newline()
         else:
-            raise ValueError("Value being appended must be a string type")
+            raise ValueError("Value being appended must be a string")
         return self
 
     def indent(self):
@@ -101,8 +117,8 @@ class PyHTML():
         attrs: str -- element attributes (default: "")
         -> self
         """
-        if not self._is_void(elem):
-            raise ValueError(f"Use the wrap context manager for non-void elements like {elem}")
+        if elem not in PyHTML._VOID_ELEMENTS:
+            raise ValueError(f"Use `wrap` for non-void element: {elem}")
         self.append(self._open_tag(elem, attrs))
         return self
 
@@ -113,10 +129,31 @@ class PyHTML():
         elem: str -- an HTML element
         attrs: str -- element attributes (default: "")
         """
-        if self._is_void(elem):
-            raise ValueError(f"Use the vwrap method for void elements like {elem}")
+        if elem in PyHTML._VOID_ELEMENTS:
+            raise ValueError(f"Use `vwrap` for void element: {elem}")
         self.append(self._open_tag(elem, attrs))
         self.depth += 1
         yield
         self.depth -= 1
         self.append(self._close_tag(elem))
+
+
+# these convenience functions will allow one to simply use
+# `import pyhtml` instead of `from pyhtml import PyHTML`
+
+def attr(*attrs):
+    """Stringify HTML attributes.
+
+    attrs: str, (str, str), or (str, int) -- attributes to stringify
+    -> str
+    """
+    return PyHTML.attr(*attrs)
+
+def new(auto_spacing=True, spaces=4, doctype=""):
+    """Create a new instance of PyHTML.
+
+    auto_spacing: bool -- automatic indentation and newlines (default: True)
+    spaces: int -- number of spaces used for indentation (default: 4)
+    doctype: str -- doctype declaration (default: "")
+    """
+    return PyHTML(auto_spacing, spaces, doctype)
