@@ -1,32 +1,31 @@
-"""Fixtures"""
+"""Test fixtures."""
 
-from typing import Callable
+from pathlib import Path
 
 import pytest
 
-import env
-from pyhtml.pyhtml import PyHTML
+from pyhtml import PyHTML
 
 
 @pytest.fixture
-def attr() -> "PyHTML":
+def attr():
     """The static method attr."""
     return PyHTML.attr
 
 @pytest.fixture
-def expect_file() -> Callable[[str], str]:
+def expect_file():
     """Read the file containing expected output."""
-    def _read(filename: str) -> str:
-        with open(env.HERE.joinpath(filename), "r") as _file:
-            return _file.read()
+    def _read(filename):
+        with open(Path(__file__).parent.joinpath(filename), "r") as f:
+            return f.read()
     return _read
 
 @pytest.fixture
-def pon() -> "PyHTML":
+def pon():
     """New instance of PyHTML with auto spacing enabled."""
     return PyHTML(auto_spacing=True)
 
 @pytest.fixture
-def poff() -> "PyHTML":
+def poff():
     """New instance of PyHTML with auto spacing disabled."""
     return PyHTML(auto_spacing=False)
