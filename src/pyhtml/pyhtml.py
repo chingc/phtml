@@ -7,7 +7,7 @@ class PyHTML():
     """Write and format HTML manually."""
 
     # https://www.w3.org/QA/2002/04/valid-dtd-list.html
-    _DOCTYPES = {
+    DOCTYPES = {
         "html5": "<!DOCTYPE html>",
         "html4.01s": '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
         "html4.01t": '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">',
@@ -19,7 +19,7 @@ class PyHTML():
     }
 
     # http://w3c.github.io/html/syntax.html#void-elements
-    _VOID_ELEMENTS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
+    VOID_ELEMENTS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
 
     @staticmethod
     def _close_tag(elem):
@@ -58,8 +58,8 @@ class PyHTML():
         self.elems = []
         self.spaces = spaces
         if doctype:
-            if doctype in PyHTML._DOCTYPES:
-                self.elems.append(PyHTML._DOCTYPES[doctype])
+            if doctype in PyHTML.DOCTYPES:
+                self.append(PyHTML.DOCTYPES[doctype])
             else:
                 raise ValueError(f"Unknown doctype declaration: '{doctype}'")
 
@@ -117,7 +117,7 @@ class PyHTML():
         attrs: str -- element attributes (default: "")
         -> self
         """
-        if elem not in PyHTML._VOID_ELEMENTS:
+        if elem not in PyHTML.VOID_ELEMENTS:
             raise ValueError(f"Use `wrap` for non-void element: {elem}")
         self.append(self._open_tag(elem, attrs))
         return self
@@ -129,7 +129,7 @@ class PyHTML():
         elem: str -- an HTML element
         attrs: str -- element attributes (default: "")
         """
-        if elem in PyHTML._VOID_ELEMENTS:
+        if elem in PyHTML.VOID_ELEMENTS:
             raise ValueError(f"Use `vwrap` for void element: {elem}")
         self.append(self._open_tag(elem, attrs))
         self.depth += 1
