@@ -1,63 +1,79 @@
-# pyhtml [![CircleCI](https://circleci.com/gh/chingc/pyhtml.svg?style=shield)](https://circleci.com/gh/chingc/pyhtml) [![codecov](https://codecov.io/gh/chingc/pyhtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/pyhtml)
+# pyhtml
 
-For those who love Python and, for reasons unknown, still like to write and format HTML by hand.
+[![CircleCI](https://circleci.com/gh/chingc/pyhtml.svg?style=shield)](https://circleci.com/gh/chingc/pyhtml) [![codecov](https://codecov.io/gh/chingc/pyhtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/pyhtml)
+
+For those who love Python and, for reasons unknown, still like to write and format HTML manually.
 
 ## Installation
 
-- Add `pyhtml.py` to your project
-- `from pyhtml import PyHTML`
+1. Add `pyhtml.py` to your project
+1. `import pyhtml`
 
 ## Reference
 
-### Constructor
+### new
 
-`PyHTML(auto_spacing: bool = True, spaces: int = 4)`
+This is the first thing to call and will return a new instance of PyHTML.
 
-- `auto_spacing: bool` - Automatic indentation and newline.  Default: `True`
+```python
+>>> pyhtml.new()
+```
 
-- `spaces: int` - The number of spaces used for indentation.  Default: `4`
+It can take the following arguments:
 
-Both of these arguments are instance variables that can be changed at any time.  Although changing the number of spaces used for indentation isn't very useful, disabling auto-spacing has its uses and will be covered below.
+- `doctype: str` - doctype declaration (default: "")
+  - valid doctypes: html5, html4.01s, html4.01t, html4.01f, xhtml1.1, xhtml1.0s, xhtml1.0t, xhtml1.0f
+- `spaces: int` - number of spaces used for indentation (default: 4)
 
-### Methods
+For html4.01 and xhtml1.0: s, t, and f stands for strict, transitional, and frameset, respectively.
 
-`attr(*attr: Union[str, Tuple[str, Union[int, str]]]) -> str`
+### attr
 
-A static method that will return a string formatted as HTML attributes.  It can take multiple strings and 2-tuples.  Strings are treated as boolean attributes and 2-tuples are treated as value attributes.  Tuples take the form (str, str) or (str, int).
+Strings and tuples are stringified into HTML attribute form.
 
-``` python
->>> PyHTML.attr(("src", "simpsons.webm"), "autoplay", ("width", 800), ("height", 600))
+```python
+>>> pyhtml.attr(("src", "simpsons.webm"), "autoplay", ("width", 800), ("height", 600))
 'src="simpsons.webm" autoplay width="800" height="600"'
 ```
 
-`append(string: str) -> self`
+Strings are treated as boolean attributes and 2-tuples are treated as value attributes.  Tuples can take the form (str, str) or (str, int).  Multiple comma separated strings and tuples can be specified.
 
-Add text.
+### append
 
-`indent() -> self`
+- `string: str` -- add arbitrary text to the HTML
 
-Add indentation.  There is no need to call this if auto-spacing is enabled.
+### indent
 
-`newline() -> self`
+Add indentation.  Indentation is handled automatically by default.  This is useful during manual spacing.
 
-Add a newline.  There is no need to call this if auto-spacing is enabled.
+### newline
 
-`vwrap(elem: str, attrs: str = "") -> self`
+Add a newline.  Newlines are handled automatically by default.  This is useful during manual spacing or when additional newlines are desired.
 
-For void elements that do not have a close tag.
+### vwrap
 
-``` python
->>> html.vwrap("img", PyHTML.attr(("src", "kwikemart.png"), ("width", 358), ("height", 278)))
+Add a void element.  These are elements that do not have a closing tag.
+
+- `elem: str` -- an HTML void element
+- `attrs: str` -- element attributes (default: "")
+
+```python
+>>> html = pyhtml.new()
+>>> html.vwrap("img", pyhtml.attr(("src", "kwikemart.png"), ("width", 358), ("height", 278)))
 >>> print(html)
 <img src="kwikemart.png" width="358" height="278">
 ```
 
-`wrap(elem: str, attrs: str = "") -> Generator`
+### wrap
 
-A context manager for adding an element.
+Add an element.  The closing tag will be inserted automatically.
 
-``` python
->>> with html.wrap("div", PyHTML.attr(("class", "big"))):
+- `elem: str` -- an HTML element
+- `attrs: str` -- element attributes (default: "")
+
+```python
+>>> html = pyhtml.new()
+>>> with html.wrap("div", pyhtml.attr(("class", "big"))):
 ...     html.append("Embiggened!")
 ...
 >>> print(html)
@@ -66,11 +82,28 @@ A context manager for adding an element.
 </div>
 ```
 
+### manual_spacing
+
+Disable automatic indentation and newlines.  Statements within the block will not have automatic indentation or newlines.
+
+```python
+>>> html = pyhtml.new()
+>>> with html.manual_spacing():
+...     with html.wrap("em"):
+...         html.append("Itchy")
+...     html.append(" & ")
+...     with html.wrap("em"):
+...         html.append("Scratchy")
+...
+>>> print(html)
+<em>Itchy</em> & <em>Scratchy</em>
+```
+
 ## Examples
 
-``` python
->>> from pyhtml import PyHTML
->>> html = PyHTML()
+```python
+>>> import pyhtml
+>>> html = pyhtml.new()
 >>> with html.wrap("html"):
 ...     with html.wrap("head"):
 ...         with html.wrap("title"):
@@ -94,34 +127,49 @@ A context manager for adding an element.
 </html>
 ```
 
-``` python
-# Setting `auto_spacing` to `False` will disable auto-spacing.
-# This is useful if you want to have a wrapped element on a
-# single line.  Set it to `True` to re-enable auto-spacing.
+```python
+# Disable auto-spacing when you want to have
+# a wrapped element on a single line.
 
->>> from pyhtml import PyHTML
->>> html = PyHTML()
->>> html.auto_spacing = False
->>> html.append("Bart! BART! ")
->>> with html.wrap("b"):
-...     html.append("BAAAART!")
+>>> import pyhtml
+>>> html = pyhtml.new()
+>>> with html.wrap("html"):
+...     with html.wrap("head"):
+...         with html.manual_spacing():
+...             html.indent()
+...             with html.wrap("title"):
+...                 html.append("Ned Flanders")
+...             html.newline()
+...     with html.wrap("body"):
+...         with html.manual_spacing():
+...             html.indent()
+...             with html.wrap("p"):
+...                 html.append("Hi diddly ho!")
+...             html.newline()
 ...
 >>> print(html)
-Bart! BART! <b>BAAAART!</b>
+<html>
+    <head>
+        <title>Ned Flanders</title>
+    </head>
+    <body>
+        <p>Hi diddly ho!</p>
+    </body>
+</html>
 ```
 
-``` python
->>> from pyhtml import PyHTML
->>> html = PyHTML()
+```python
+# Tip: Context managers can be nested.
+
+>>> import pyhtml
+>>> html = pyhtml.new()
 >>> family = ["homer", "marge", "bart", "lisa", "maggie"]
->>> with html.wrap("ul"):
-...     html.auto_spacing = False
+>>> with html.wrap("ul"), html.manual_spacing():
 ...     for member in family:
 ...         html.indent()
 ...         with html.wrap("li"):
 ...             html.append(member)
 ...         html.newline()
-...     html.auto_spacing = True
 ...
 >>> print(html)
 <ul>
