@@ -79,7 +79,7 @@ class TestNewline():
 class TestDocType():
     def test_doctype_declaration(self, doctypes, pdoc):
         for key, value in doctypes.items():
-            assert f"{value}\n" == pdoc(key)
+            assert value == pdoc(key)
 
     def test_unknown_doctype(self, pdoc):
         with pytest.raises(ValueError):

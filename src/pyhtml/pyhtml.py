@@ -1,6 +1,10 @@
 """PyHTML"""
 
 from contextlib import contextmanager
+from typing import Generator, Tuple, Union
+
+
+Attribute = Union[str, Tuple[str, Union[int, str]]]
 
 
 class PyHTML():
@@ -22,19 +26,18 @@ class PyHTML():
     VOID_ELEMENTS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]
 
     @staticmethod
-    def _close_tag(elem):
+    def _close_tag(elem: str) -> str:
         return f"</{elem}>"
 
     @staticmethod
-    def _open_tag(elem, attrs=""):
+    def _open_tag(elem: str, attrs: str = "") -> str:
         return f"<{elem}{'' if not attrs else f' {attrs}'}>"
 
     @staticmethod
-    def attr(*attrs):
+    def attr(*attrs: Attribute) -> str:
         """Strings and tuples are stringified into HTML attribute form.
 
-        attrs: str, (str, str), or (str, int) -- attributes to stringify
-        -> str
+        attrs -- attributes to stringify
         """
         formatted = []
         for attr_ in attrs:
@@ -46,7 +49,7 @@ class PyHTML():
                 raise ValueError(f"Bad attribute: {attr_}")
         return " ".join(formatted)
 
-    def __init__(self, doctype="", spaces=4):
+    def __init__(self, doctype: str = "", spaces: int = 4) -> None:
         """Create a new instance of PyHTML.
 
         doctype: str -- doctype declaration (default: "")
@@ -54,30 +57,30 @@ class PyHTML():
         """
         self.auto_spacing = True
         self.depth = 0
-        self.elems = []
         self.spaces = spaces
-        if doctype:
-            if doctype in PyHTML.DOCTYPES:
-                self.append(PyHTML.DOCTYPES[doctype])
-            else:
-                raise ValueError(f"Unknown doctype declaration: '{doctype}'")
+        if doctype in PyHTML.DOCTYPES:
+            self.elems = [PyHTML.DOCTYPES[doctype]]
+        elif not doctype:
+            self.elems = []
+        else:
+            raise ValueError(f"Unknown doctype declaration: '{doctype}'")
 
-    def __contains__(self, item):
+    def __contains__(self, item: object) -> bool:
         return str(item) in str(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return str(self) == str(other)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(str(self))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "".join(self.elems)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "".join(self.elems)
 
-    def append(self, string):
+    def append(self, string: str) -> "PyHTML":
         """Add a string.
 
         string: str -- add arbitrary text to the HTML
@@ -93,7 +96,7 @@ class PyHTML():
             raise ValueError("Value being appended must be a string")
         return self
 
-    def indent(self):
+    def indent(self) -> "PyHTML":
         """Add indentation.
 
         -> self
@@ -101,7 +104,7 @@ class PyHTML():
         self.elems.append(" " * self.spaces * self.depth)
         return self
 
-    def newline(self):
+    def newline(self) -> "PyHTML":
         """Add a newline.
 
         -> self
@@ -109,7 +112,7 @@ class PyHTML():
         self.elems.append("\n")
         return self
 
-    def vwrap(self, elem, attrs=""):
+    def vwrap(self, elem: str, attrs: str = "") -> "PyHTML":
         """Add a void element.
 
         elem: str -- an HTML void element
@@ -122,7 +125,7 @@ class PyHTML():
         return self
 
     @contextmanager
-    def wrap(self, elem, attrs=""):
+    def wrap(self, elem: str, attrs: str = "") -> Generator:
         """Add an element.
 
         elem: str -- an HTML element
@@ -137,7 +140,7 @@ class PyHTML():
         self.append(self._close_tag(elem))
 
     @contextmanager
-    def manual_spacing(self):
+    def manual_spacing(self) -> Generator:
         """Disable automatic indentation and newlines."""
         self.auto_spacing = False
         yield
@@ -147,7 +150,7 @@ class PyHTML():
 # these convenience functions will allow one to simply use
 # `import pyhtml` instead of `from pyhtml import PyHTML`
 
-def attr(*attrs):
+def attr(*attrs: Attribute) -> str:
     """Stringify HTML attributes.
 
     attrs: str, (str, str), or (str, int) -- attributes to stringify
@@ -155,7 +158,7 @@ def attr(*attrs):
     """
     return PyHTML.attr(*attrs)
 
-def new(doctype="", spaces=4):
+def new(doctype: str = "", spaces: int = 4) -> "PyHTML":
     """Create a new instance of PyHTML.
 
     doctype: str -- doctype declaration (default: "")
