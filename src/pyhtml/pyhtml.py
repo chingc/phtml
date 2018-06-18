@@ -31,7 +31,7 @@ class PyHTML():
 
     @staticmethod
     def attr(*attrs):
-        """Stringify HTML attributes.
+        """Strings and tuples are stringified into HTML attribute form.
 
         attrs: str, (str, str), or (str, int) -- attributes to stringify
         -> str
@@ -46,14 +46,13 @@ class PyHTML():
                 raise ValueError(f"Bad attribute: {attr_}")
         return " ".join(formatted)
 
-    def __init__(self, auto_spacing=True, spaces=4, doctype=""):
+    def __init__(self, doctype="", spaces=4):
         """Create a new instance of PyHTML.
 
-        auto_spacing: bool -- automatic indentation and newlines (default: True)
-        spaces: int -- number of spaces used for indentation (default: 4)
         doctype: str -- doctype declaration (default: "")
+        spaces: int -- number of spaces used for indentation (default: 4)
         """
-        self.auto_spacing = auto_spacing
+        self.auto_spacing = True
         self.depth = 0
         self.elems = []
         self.spaces = spaces
@@ -81,7 +80,7 @@ class PyHTML():
     def append(self, string):
         """Add a string.
 
-        string: str -- arbitrary text to add to the HTML
+        string: str -- add arbitrary text to the HTML
         -> self
         """
         if isinstance(string, str):
@@ -137,6 +136,13 @@ class PyHTML():
         self.depth -= 1
         self.append(self._close_tag(elem))
 
+    @contextmanager
+    def manual_spacing(self):
+        """Disable automatic indentation and newlines."""
+        self.auto_spacing = False
+        yield
+        self.auto_spacing = True
+
 
 # these convenience functions will allow one to simply use
 # `import pyhtml` instead of `from pyhtml import PyHTML`
@@ -149,11 +155,10 @@ def attr(*attrs):
     """
     return PyHTML.attr(*attrs)
 
-def new(auto_spacing=True, spaces=4, doctype=""):
+def new(doctype="", spaces=4):
     """Create a new instance of PyHTML.
 
-    auto_spacing: bool -- automatic indentation and newlines (default: True)
-    spaces: int -- number of spaces used for indentation (default: 4)
     doctype: str -- doctype declaration (default: "")
+    spaces: int -- number of spaces used for indentation (default: 4)
     """
-    return PyHTML(auto_spacing, spaces, doctype)
+    return PyHTML(doctype, spaces)

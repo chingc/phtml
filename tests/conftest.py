@@ -28,16 +28,18 @@ def expect_file():
 @pytest.fixture
 def pon():
     """New instance of PyHTML with auto spacing enabled."""
-    return pyhtml.new(auto_spacing=True)
+    return pyhtml.new()
 
 @pytest.fixture
 def poff():
     """New instance of PyHTML with auto spacing disabled."""
-    return pyhtml.new(auto_spacing=False)
+    html = pyhtml.new()
+    html.auto_spacing = False
+    return html
 
 @pytest.fixture
 def pdoc():
     """New instance of PyHTML with the specified doctype."""
     def _new(doctype):
-        return pyhtml.new(auto_spacing=False, doctype=doctype)
+        return pyhtml.new(doctype)
     return _new

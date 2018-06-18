@@ -79,7 +79,7 @@ class TestNewline():
 class TestDocType():
     def test_doctype_declaration(self, doctypes, pdoc):
         for key, value in doctypes.items():
-            assert value == pdoc(key)
+            assert f"{value}\n" == pdoc(key)
 
     def test_unknown_doctype(self, pdoc):
         with pytest.raises(ValueError):
@@ -171,18 +171,15 @@ class TestWrapAutoSpacingOn():
 
 class TestWrapAutoSpacingMixed():
     def test_nested_oneline(self, pon, expect_file):
-        with pon.wrap("a"):
-            pon.auto_spacing = False
+        with pon.wrap("a"), pon.manual_spacing():
             pon.indent()
             with pon.wrap("b"):
                 pon.append("2")
-            pon.auto_spacing = True
             pon.newline()
         assert pon == expect_file("expected_nested_oneline.txt")
 
     def test_nested_oneline_sibling(self, pon, expect_file):
-        with pon.wrap("a"):
-            pon.auto_spacing = False
+        with pon.wrap("a"), pon.manual_spacing():
             pon.indent()
             with pon.wrap("b"):
                 pon.append("2")
@@ -190,7 +187,6 @@ class TestWrapAutoSpacingMixed():
             with pon.wrap("c"):
                 pon.append("3")
             pon.newline()
-            pon.auto_spacing = True
         assert pon == expect_file("expected_nested_oneline_sibling.txt")
 
     def test_complex(self, pon, expect_file):
@@ -200,37 +196,34 @@ class TestWrapAutoSpacingMixed():
             with pon.wrap("b"):
                 pon.append("2")
             pon.newline()
-            pon.auto_spacing = False
-            pon.indent()
-            with pon.wrap("c"):
-                pon.append("3")
-            pon.newline().indent()
-            with pon.wrap("d"):
-                pon.append("4")
-            pon.newline().newline()
-            pon.auto_spacing = True
+            with pon.manual_spacing():
+                pon.indent()
+                with pon.wrap("c"):
+                    pon.append("3")
+                pon.newline().indent()
+                with pon.wrap("d"):
+                    pon.append("4")
+                pon.newline().newline()
             with pon.wrap("e"):
                 pon.append("5")
                 pon.newline()
-            pon.auto_spacing = False
-            pon.indent()
-            with pon.wrap("f"):
-                pon.append("6")
-            pon.newline().newline()
-            pon.auto_spacing = True
+            with pon.manual_spacing():
+                pon.indent()
+                with pon.wrap("f"):
+                    pon.append("6")
+                pon.newline().newline()
             with pon.wrap("g"):
                 with pon.wrap("h"):
                     pon.append("8")
-                    pon.auto_spacing = False
-                    pon.indent()
-                    with pon.wrap("i"):
-                        pon.append("9")
-                    with pon.wrap("j"):
-                        pon.append("10")
-                    pon.newline().newline().indent()
-                    with pon.wrap("k"), pon.wrap("l"):
-                        pon.append("11 12")
-                    pon.newline()
-                    pon.auto_spacing = True
+                    with pon.manual_spacing():
+                        pon.indent()
+                        with pon.wrap("i"):
+                            pon.append("9")
+                        with pon.wrap("j"):
+                            pon.append("10")
+                        pon.newline().newline().indent()
+                        with pon.wrap("k"), pon.wrap("l"):
+                            pon.append("11 12")
+                        pon.newline()
                 pon.append("7")
         assert pon == expect_file("expected_complex.txt")
