@@ -1,60 +1,68 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2
+
 jobs:
-  build:
+  python-3.6.5:
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:3.6.5
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
 
     steps:
       - checkout
 
-      # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Pipfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - pip-cache-v1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          - pip-cache-v1
 
       - run:
-          name: install dependencies
-          command: |
-            pip install pipenv
-            pipenv install -d
+          name: Install Dependencies
+          command: pipenv install -d
           environment:
             PIPENV_VENV_IN_PROJECT: 1
 
       - save_cache:
+          key: pip-cache-v1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
             - ./venv
-          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
 
-      # run tests!
-      # this example uses Django's built-in test-runner
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
       - run:
-          name: run tests
+          name: Run Tests
+          command: pipenv run coverage run -m pytest --junit-xml=test-results/pytest/results.xml
+
+      - run:
+          name: Submit Code Coverage
+          command: pipenv run codecov
+          when: always
+
+      - run:
+          name: Mypy
+          command: pipenv run mypy --strict -p pyhtml
+          working_directory: src
+          when: always
+
+      - run:
+          name: Pylint
+          # R0201: no-self-use
+          # R0903: too-few-public-methods
+          # C0103: invalid-name
+          # C0111: missing-docstring
+          # C0301: line-too-long
+          # C0321: multiple-statements
+          # E0401: import-error
           command: |
-            pipenv run coverage run -m pytest
+            pipenv run pylint -d C0103,C0301 src
+            pipenv run pylint -d R0201,R0903,C0103,C0111,C0301,C0321,E0401 tests
+          when: always
+
+      - store_test_results:
+          path: test-results
 
       - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          path: test-results
+          destination: test-results
 
-      - run:
-          name: submit code coverage
-          command: |
-            pipenv run codecov
+workflows:
+  version: 2
+
+  build:
+    jobs:
+      - python-3.6.5
