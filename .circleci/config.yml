@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  python-3.6.5:
+  python-latest:
     docker:
       - image: circleci/python:3.6.5
 
@@ -9,9 +9,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          keys:
-          - pip-cache-v1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-          - pip-cache-v1
+          key: pip-cache-20180619.0-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
 
       - run:
           name: Install Dependencies
@@ -20,9 +18,9 @@ jobs:
             PIPENV_VENV_IN_PROJECT: 1
 
       - save_cache:
-          key: pip-cache-v1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: pip-cache-20180619.0-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
-            - ./venv
+            - .venv
 
       - run:
           name: Run Tests
@@ -65,4 +63,4 @@ workflows:
 
   build:
     jobs:
-      - python-3.6.5
+      - python-latest
