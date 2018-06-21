@@ -33,22 +33,20 @@ jobs:
 
       - run:
           name: Mypy
-          command: pipenv run mypy --strict -p pyhtml
-          working_directory: src
+          command: pipenv run mypy --strict src/pyhtml
           when: always
 
       - run:
           name: Pylint
           # R0201: no-self-use
           # R0903: too-few-public-methods
-          # C0103: invalid-name
           # C0111: missing-docstring
           # C0301: line-too-long
           # C0321: multiple-statements
           # E0401: import-error
           command: |
-            pipenv run pylint -d C0103,C0301 src
-            pipenv run pylint -d R0201,R0903,C0103,C0111,C0301,C0321,E0401 tests
+            pipenv run pylint -d C0301 src/pyhtml/*.py
+            pipenv run pylint -d R0201,R0903,C0111,C0301,C0321,E0401 tests/*.py
           when: always
 
       - store_test_results:

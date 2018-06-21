@@ -21,8 +21,8 @@ def doctypes():
 def expect_file():
     """Read the file containing expected output."""
     def _read(filename):
-        with open(Path(__file__).parent.joinpath(filename), "r") as f:
-            return f.read()
+        with open(Path(__file__).parent.joinpath(filename), "r") as lines:
+            return lines.read()
     return _read
 
 @pytest.fixture

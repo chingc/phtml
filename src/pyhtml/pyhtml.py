@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from typing import Generator, Tuple, Union
 
 
-Attribute = Union[str, Tuple[str, Union[int, str]]]
+ATTRIBUTE = Union[str, Tuple[str, Union[int, str]]]
 
 
 class PyHTML():
@@ -34,7 +34,7 @@ class PyHTML():
         return f"<{elem}{'' if not attrs else f' {attrs}'}>"
 
     @staticmethod
-    def attr(*attrs: Attribute) -> str:
+    def attr(*attrs: ATTRIBUTE) -> str:
         """Strings and tuples are stringified into HTML attribute form.
 
         attrs -- attributes to stringify
@@ -52,8 +52,8 @@ class PyHTML():
     def __init__(self, doctype: str = "", spaces: int = 4) -> None:
         """Create a new instance of PyHTML.
 
-        doctype: str -- doctype declaration (default: "")
-        spaces: int -- number of spaces used for indentation (default: 4)
+        doctype -- doctype declaration (default: "")
+        spaces -- number of spaces used for indentation (default: 4)
         """
         self.auto_spacing = True
         self.depth = 0
@@ -83,8 +83,7 @@ class PyHTML():
     def append(self, string: str) -> "PyHTML":
         """Add a string.
 
-        string: str -- add arbitrary text to the HTML
-        -> self
+        string -- add arbitrary text to the HTML
         """
         if isinstance(string, str):
             if self.auto_spacing:
@@ -97,27 +96,20 @@ class PyHTML():
         return self
 
     def indent(self) -> "PyHTML":
-        """Add indentation.
-
-        -> self
-        """
+        """Add indentation."""
         self.elems.append(" " * self.spaces * self.depth)
         return self
 
     def newline(self) -> "PyHTML":
-        """Add a newline.
-
-        -> self
-        """
+        """Add a newline."""
         self.elems.append("\n")
         return self
 
     def vwrap(self, elem: str, attrs: str = "") -> "PyHTML":
         """Add a void element.
 
-        elem: str -- an HTML void element
-        attrs: str -- element attributes (default: "")
-        -> self
+        elem -- an HTML void element
+        attrs -- element attributes (default: "")
         """
         if elem not in PyHTML.VOID_ELEMENTS:
             raise ValueError(f"Use `wrap` for non-void element: {elem}")
@@ -128,8 +120,8 @@ class PyHTML():
     def wrap(self, elem: str, attrs: str = "") -> Generator:
         """Add an element.
 
-        elem: str -- an HTML element
-        attrs: str -- element attributes (default: "")
+        elem -- an HTML element
+        attrs -- element attributes (default: "")
         """
         if elem in PyHTML.VOID_ELEMENTS:
             raise ValueError(f"Use `vwrap` for void element: {elem}")
@@ -150,18 +142,17 @@ class PyHTML():
 # these convenience functions will allow one to simply use
 # `import pyhtml` instead of `from pyhtml import PyHTML`
 
-def attr(*attrs: Attribute) -> str:
+def attr(*attrs: ATTRIBUTE) -> str:
     """Stringify HTML attributes.
 
-    attrs: str, (str, str), or (str, int) -- attributes to stringify
-    -> str
+    attrs -- attributes to stringify
     """
     return PyHTML.attr(*attrs)
 
 def new(doctype: str = "", spaces: int = 4) -> "PyHTML":
     """Create a new instance of PyHTML.
 
-    doctype: str -- doctype declaration (default: "")
-    spaces: int -- number of spaces used for indentation (default: 4)
+    doctype -- doctype declaration (default: "")
+    spaces -- number of spaces used for indentation (default: 4)
     """
     return PyHTML(doctype, spaces)
