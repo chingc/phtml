@@ -9,7 +9,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: pip-cache-20180619.0-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: pip-cache-2018.1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
 
       - run:
           name: Install Dependencies
@@ -18,7 +18,7 @@ jobs:
             PIPENV_VENV_IN_PROJECT: 1
 
       - save_cache:
-          key: pip-cache-20180619.0-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: pip-cache-2018.1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
             - .venv
 
@@ -33,7 +33,7 @@ jobs:
 
       - run:
           name: Mypy
-          command: pipenv run mypy --strict src/pyhtml
+          command: pipenv run mypy --strict pyhtml
           when: always
 
       - run:
@@ -43,10 +43,10 @@ jobs:
           # C0111: missing-docstring
           # C0301: line-too-long
           # C0321: multiple-statements
-          # E0401: import-error
+          # E1101: no-member
           command: |
-            pipenv run pylint -d C0301 src/pyhtml/*.py
-            pipenv run pylint -d R0201,R0903,C0111,C0301,C0321,E0401 tests/*.py
+            pipenv run pylint -d C0301 pyhtml
+            pipenv run pylint -d R0201,R0903,C0111,C0301,C0321,E1101 tests
           when: always
 
       - store_test_results:
