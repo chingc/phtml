@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-import pyhtml
+import pyhtml.main as pyhtml
 
 
 @pytest.fixture
