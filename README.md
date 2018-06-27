@@ -1,6 +1,6 @@
 # pyhtml
 
-[![CircleCI](https://circleci.com/gh/chingc/pyhtml.svg?style=shield)](https://circleci.com/gh/chingc/pyhtml) [![codecov](https://codecov.io/gh/chingc/pyhtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/pyhtml)
+[![CircleCI](https://circleci.com/gh/chingc/pyhtml.svg?style=shield)](https://circleci.com/gh/chingc/pyhtml) [![codecov](https://codecov.io/gh/chingc/pyhtml/branch/master/graph/badge.svg)](https://codecov.io/gh/chingc/pyhtml) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 For those who love Python and, for reasons unknown, still like to write and format HTML manually.
 
