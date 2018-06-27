@@ -139,8 +139,7 @@ class PyHTML():
         self.auto_spacing = True
 
 
-# these convenience functions will allow one to simply use
-# `import pyhtml` instead of `from pyhtml import PyHTML`
+# for convenience
 
 def attr(*attrs: ATTRIBUTE) -> str:
     """Stringify HTML attributes.

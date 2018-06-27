@@ -23,7 +23,7 @@ class TestDunder():
 class TestAttribute():
     bad_in = [None, True, 1, [], {}, (), ("a",), ("a", "b", "c")]  # non-strings and len(tuple) != 2
     good_in = [["a"], ["a", "b"], [("a", 1)], [("a", 1), ("b", "2")], ["a", ("b", 2)], [("a", 1), "b"]]
-    good_out = ["a", "a b", 'a="1"', 'a="1" b="2"', 'a b="2"', 'a="1" b', 1]
+    good_out = ["a", "a b", 'a="1"', 'a="1" b="2"', 'a b="2"', 'a="1" b']
 
     def test_empty_input(self, attr):
         assert attr() == ""
@@ -138,47 +138,47 @@ class TestWrapAutoSpacingOff():
 
 
 class TestWrapAutoSpacingOn():
-    def test_single(self, pon, expect_file):
+    def test_single(self, pon, read_file):
         with pon.wrap("a"):
             pon.append("1")
-        assert pon == expect_file("expected_single.txt")
+        assert pon == read_file("expected_single.txt")
 
-    def test_nested(self, pon, expect_file):
+    def test_nested(self, pon, read_file):
         with pon.wrap("a"), pon.wrap("b"):
             pon.append("1 2")
-        assert pon == expect_file("expected_nested.txt")
+        assert pon == read_file("expected_nested.txt")
 
-    def test_double_nested(self, pon, expect_file):
+    def test_double_nested(self, pon, read_file):
         with pon.wrap("a"), pon.wrap("b"), pon.wrap("c"):
             pon.append("1 2 3")
-        assert pon == expect_file("expected_double_nested.txt")
+        assert pon == read_file("expected_double_nested.txt")
 
-    def test_sibling(self, pon, expect_file):
+    def test_sibling(self, pon, read_file):
         with pon.wrap("a"):
             pon.append("1")
         with pon.wrap("b"):
             pon.append("2")
-        assert pon == expect_file("expected_sibling.txt")
+        assert pon == read_file("expected_sibling.txt")
 
-    def test_nested_sibling(self, pon, expect_file):
+    def test_nested_sibling(self, pon, read_file):
         with pon.wrap("a"):
             with pon.wrap("b"):
                 pon.append("2")
             with pon.wrap("c"):
                 pon.append("3")
-        assert pon == expect_file("expected_nested_sibling.txt")
+        assert pon == read_file("expected_nested_sibling.txt")
 
 
 class TestWrapAutoSpacingMixed():
-    def test_nested_oneline(self, pon, expect_file):
+    def test_nested_oneline(self, pon, read_file):
         with pon.wrap("a"), pon.manual_spacing():
             pon.indent()
             with pon.wrap("b"):
                 pon.append("2")
             pon.newline()
-        assert pon == expect_file("expected_nested_oneline.txt")
+        assert pon == read_file("expected_nested_oneline.txt")
 
-    def test_nested_oneline_sibling(self, pon, expect_file):
+    def test_nested_oneline_sibling(self, pon, read_file):
         with pon.wrap("a"), pon.manual_spacing():
             pon.indent()
             with pon.wrap("b"):
@@ -187,9 +187,9 @@ class TestWrapAutoSpacingMixed():
             with pon.wrap("c"):
                 pon.append("3")
             pon.newline()
-        assert pon == expect_file("expected_nested_oneline_sibling.txt")
+        assert pon == read_file("expected_nested_oneline_sibling.txt")
 
-    def test_complex(self, pon, expect_file):
+    def test_complex(self, pon, read_file):
         with pon.wrap("a"):
             pon.append("1")
             pon.newline()
@@ -226,4 +226,4 @@ class TestWrapAutoSpacingMixed():
                             pon.append("11 12")
                         pon.newline()
                 pon.append("7")
-        assert pon == expect_file("expected_complex.txt")
+        assert pon == read_file("expected_complex.txt")
