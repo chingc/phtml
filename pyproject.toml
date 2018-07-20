@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "pyhtml"
+version = "1.1.1"
+description = "Write and format HTML manually with Python!"
+authors = ["Ching Chow <ching.chow.sc@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+codecov = "^2.0"
+mypy = "^0.620.0"
+pylint = "^2.0"
+pytest = "^3.0"
+rope = "^0.10.7"
