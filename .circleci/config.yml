@@ -1,39 +1,87 @@
-version: 2
+version: 2.1
 
-jobs:
-  cache:
-    docker: &py37
-      - image: circleci/python:3.7
+executors:
+
+  python:
+
+    parameters:
+      tag:
+        description: circleci/python docker tag
+        type: string
+
+    docker:
+      - image: circleci/python:<< parameters.tag >>
+
+commands:
+
+  dependencies:
+
     steps:
-      - checkout
-      - restore_cache: &cache_key
-          key: pip-cache-v1-{{ .Branch }}-{{ checksum "pyproject.lock" }}
       - run:
-          name: Install dependencies
+          name: Install Dependencies
           command: |
             python -m venv .venv
             source .venv/bin/activate
+            python -m pip install --upgrade pip setuptools
             pip install poetry
             poetry config settings.virtualenvs.in-project true
             poetry install
-      - save_cache:
-          <<: *cache_key
-          paths:
-            - .venv
 
-  lint:
-    docker: *py37
+jobs:
+
+  test:
+
+    parameters:
+      tag:
+        description: circleci/python docker tag
+        type: string
+
+    executor:
+      name: python
+      tag: << parameters.tag >>
+
     steps:
       - checkout
-      - restore_cache:
-          <<: *cache_key
+
+      - dependencies
+
+      - run:
+          name: Pytest
+          command: |
+            source .venv/bin/activate
+            poetry run coverage run -m pytest --junit-xml=test-results/pytest/results.xml
+
+      - run:
+          name: Codecov
+          command: |
+            source .venv/bin/activate
+            poetry run codecov
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+
+  lint:
+
+    executor:
+      name: python
+      tag: 3.7.1
+
+    steps:
+      - checkout
+
+      - dependencies
+
       - run:
           name: Mypy
           command: |
             source .venv/bin/activate
             poetry run mypy --ignore-missing-imports --strict pyhtml
             # poetry run mypy --ignore-missing-imports --strict tests
-          when: always
+
       - run:
           name: Pylint
           # R0201: no-self-use
@@ -45,47 +93,27 @@ jobs:
             source .venv/bin/activate
             poetry run pylint -d C0301 pyhtml
             poetry run pylint -d R0201,R0903,C0111,C0301,C0321 tests
-          when: always
-
-  test:
-    docker: *py37
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *cache_key
-      - run:
-          name: Test
-          command: |
-            source .venv/bin/activate
-            poetry run coverage run -m pytest --junit-xml=test-results/pytest/results.xml
-      - run:
-          name: Codecov
-          command: |
-            source .venv/bin/activate
-            poetry run codecov
-      - store_test_results:
-          path: test-results
-      - store_artifacts:
-          path: test-results
-          destination: test-results
 
 workflows:
+
   version: 2
 
   commit:
+
     jobs:
-      - cache
-      - lint:
-          requires:
-            - cache
       - test:
-          requires:
-            - cache
+          name: python 3.7
+          tag: 3.7.1
+      - lint
 
   weekly:
+
     jobs:
+      - test:
+          name: python 3.7
+          tag: 3.7.1
       - lint
-      - test
+
     triggers:
       - schedule:
           cron: "1 0 * * 1"
